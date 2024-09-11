@@ -72,6 +72,8 @@
             27: "{{ url_for('static', filename='images/rank_icons/27.png') }}",
     };
 
+    const eco_max_value = 16000;
+
     $(document).ready(function() {
         // initialize socket
         var socket = io();
@@ -161,6 +163,55 @@
             red_team_container.empty();
             blue_team_container.empty();
 
+            eco_frags = {}
+            for (let i = 0; i < info.rounds.length; i++) {
+                red_team_value = 0;               
+                blue_team_value = 0;               
+
+                // skip the pistol rounds for both halfs
+                if (i == 0 || i == 12) {
+                    continue;
+                }
+
+
+                // get loadout value for each team
+                for (let j = 0; j < info.rounds[i].player_stats.length; j++) {
+                    player = info.rounds[i].player_stats[j];
+
+                    // Initialize the player's eco frags count only if it doesn't already exist
+                    if (!(player.player_puuid in eco_frags)) {
+                        eco_frags[player.player_puuid] = 0;
+                    }
+
+                    if (player.player_team.toLowerCase() == "red") {
+                        red_team_value += player.economy.loadout_value;
+                    } else {
+                        blue_team_value += player.economy.loadout_value;
+                    }
+                }
+
+                console.log(red_team_value);
+
+                // count eco frags
+                if (red_team_value < eco_max_value) {
+                    for (let j = 0; j < info.rounds[i].player_stats.length; j++) {
+                        player = info.rounds[i].player_stats[j];
+                        if (player.player_team.toLowerCase() == "blue") {
+                            eco_frags[player.player_puuid] += player.kills;
+                        }
+                    }
+                } else if (blue_team_value < eco_max_value) {
+                    for (let j = 0; j < info.rounds[i].player_stats.length; j++) {
+                        player = info.rounds[i].player_stats[j];
+                        if (player.player_team.toLowerCase() == "red") {
+                            eco_frags[player.player_puuid] += player.kills;
+                        }
+                    }
+                }
+            }
+
+            console.log(eco_frags);
+
             console.log(info);
             // sort teams by combat score (ACS)
             info.players_red.sort((a,b) => b.stats.score - a.stats.score);
@@ -171,17 +222,7 @@
                 let row = document.createElement("div");
                 row.classList.add("row");
 
-                row.innerHTML = `
-                    <div class="col-1"><img src="${image_paths[player.character.toLowerCase()]}" class="overlay-agent-icon"/></div> 
-                    <div class="col-2">${player.name}#${player.tag}</div>
-                    <div class="col-1"><img src="${image_paths[player.currenttier]}" class="overlay-rank-icon"/></div>
-                    <div class="col-1">${Math.round(player.stats.score / info.num_rounds)}</div>
-                    <div class="col-1">${player.stats.kills}</div>
-                    <div class="col-1">${player.stats.deaths}</div>
-                    <div class="col-1">${player.stats.assists}</div>
-                    <div class="col-1">${Math.round(player.damage_made / info.num_rounds)}</div>
-                    <div class="col-1">${Math.round(player.stats.headshots / (player.stats.headshots + player.stats.bodyshots + player.stats.legshots) * 100)}%</div>
-                    `
+                row.innerHTML = generate_row_html(player, info, eco_frags);
 
                 red_team_container.append(row)
             }
@@ -191,17 +232,7 @@
                 let row = document.createElement("div");
                 row.classList.add("row");
 
-                row.innerHTML = `
-                    <div class="col-1"><img src="${image_paths[player.character.toLowerCase()]}" class="overlay-agent-icon"/></div> 
-                    <div class="col-2">${player.name}#${player.tag}</div>
-                    <div class="col-1"><img src="${image_paths[player.currenttier]}" class="overlay-rank-icon"/></div>
-                    <div class="col-1">${Math.round(player.stats.score / info.num_rounds)}</div>
-                    <div class="col-1">${player.stats.kills}</div>
-                    <div class="col-1">${player.stats.deaths}</div>
-                    <div class="col-1">${player.stats.assists}</div>
-                    <div class="col-1">${Math.round(player.damage_made / info.num_rounds)}</div>
-                    <div class="col-1">${Math.round(player.stats.headshots / (player.stats.headshots + player.stats.bodyshots + player.stats.legshots) * 100)}%</div>
-                    `
+                row.innerHTML = generate_row_html(player, info, eco_frags);
 
                 blue_team_container.append(row)
             }
@@ -243,6 +274,22 @@
                 show_overlay();
             }
         });
+
+        function generate_row_html(player, info, eco_frags) {
+            row_html = `
+                <div class="col-1"><img src="${image_paths[player.character.toLowerCase()]}" class="overlay-agent-icon"/></div> 
+                <div class="col-2">${player.name}#${player.tag}</div>
+                <div class="col-1"><img src="${image_paths[player.currenttier]}" class="overlay-rank-icon"/></div>
+                <div class="col-1">${Math.round(player.stats.score / info.num_rounds)}</div>
+                <div class="col-1">${player.stats.kills} | ${eco_frags[player.puuid]}</div>
+                <div class="col-1">${player.stats.deaths}</div>
+                <div class="col-1">${player.stats.assists}</div>
+                <div class="col-1">${Math.round(player.damage_made / info.num_rounds)}</div>
+                <div class="col-1">${Math.round(player.stats.headshots / (player.stats.headshots + player.stats.bodyshots + player.stats.legshots) * 100)}%</div>
+                `;
+            return row_html;
+        }
+
     });
 </script>
 </head>

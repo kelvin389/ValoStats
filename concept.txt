@@ -1,0 +1,20 @@
+eco_frags = []
+
+for each round
+    red_loadout_val = 0
+    blue_loadout_val = 0
+
+    for each player_stats
+        if red
+            red_loadout_val += player.value
+        else
+            blue_loadout_val += player.value
+
+    if red_loadout_val < 1600:
+        for each player_stats
+            if player_stats.team == blue
+                eco_frags[uuid] += player_stats.kills
+    if blue_loadout_val < 1600:
+        for each player_stats
+            if player_stats.team == red
+                eco_frags[uuid] += player_stats.kills

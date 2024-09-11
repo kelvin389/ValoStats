@@ -163,6 +163,7 @@ def get_relevent_info_large(match_info):
     info["start_time"] = match_info["metadata"]["game_start"] * 1000 # convert from seconds to ms since epoch
     info["mode"] = match_info["metadata"]["mode"]
 
+    info["rounds"] = match_info["rounds"]
     info["num_rounds"] = len(match_info["rounds"])
 
     info["players_red"] = match_info["players"]["red"]
