@@ -1,4 +1,4 @@
-Flask app that allows viewing Valorant stats for recently played matches.
+Flask app that allows viewing Valorant stats for recently played matches using [HenrikDev Unofficial Valorant API](https://github.com/Henrik-3/unofficial-valorant-api).
 
 create `.env` file with 2 lines:
 
