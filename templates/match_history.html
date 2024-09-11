@@ -42,6 +42,7 @@
             iso: "{{ url_for('static', filename='images/agent_icons/iso.png') }}",
             clove: "{{ url_for('static', filename='images/agent_icons/clove.png') }}",
             vyse: "{{ url_for('static', filename='images/agent_icons/vyse.png') }}",
+            0: "{{ url_for('static', filename='images/rank_icons/0.png') }}",
             1: "{{ url_for('static', filename='images/rank_icons/1.png') }}",
             2: "{{ url_for('static', filename='images/rank_icons/2.png') }}",
             3: "{{ url_for('static', filename='images/rank_icons/3.png') }}",
@@ -123,6 +124,8 @@
             // add appropriate css class based on whether the player won or not
             (info.team_info.has_won ? match_data_div.classList.add("win") : match_data_div.classList.add("loss"));
 
+            console.log(info.tier);
+
             // generate html for a match
             match_data_div.innerHTML = `
                 <img src="${image_paths[info.tier]}" class="rank-icon img-fluid"/>
@@ -141,10 +144,14 @@
 
         socket.on("show-loading", function() {
             $("#loading").show();
+            // dont allow user to load more while matches is already loading
+            $("#load-more-button").hide();
         });
 
         socket.on("hide-loading", function() {
             $("#loading").hide();
+            // dont allow user to load more while matches is already loading
+            $("#load-more-button").show();
         });
 
         socket.on("display-specific-match", function(info) {

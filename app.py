@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 # loading from .env
 from dotenv import load_dotenv
 from os import getenv
@@ -8,6 +9,8 @@ from flask import Flask, request, render_template, redirect, url_for, jsonify
 from flask_socketio import SocketIO, emit
 
 URL_BASE = "https://api.henrikdev.xyz/valorant"
+RATE_LIMIT_SLEEP_TIME = 60
+
 app = Flask(__name__)
 socketio = SocketIO(app)
 
@@ -64,10 +67,23 @@ def load_match_history(puuid, start_index, end_index):
     data = query_match_history(puuid, "na", start_index, end_index)
     matches = data["History"]
 
+
+    for match in matches:
+        id = match["MatchID"]
+        match_info = query_match_info(id)["data"]
+        info = get_relevent_info_small(match_info, puuid)
+        socketio.emit("append-match-history", info)
+    socketio.emit("hide-loading")
+
+
+    # code below loads the matches in batches.
+    # replaced by above for loop which loads matches as the api responds (more responsive)
+    """
     # query API for match info of every match.
     match_infos = []
     for match in matches:
         id = match["MatchID"]
+        print(id)
         info = query_match_info(id)["data"]
         match_infos.append(info)
 
@@ -78,13 +94,15 @@ def load_match_history(puuid, start_index, end_index):
     for match_info in match_infos:
         info = get_relevent_info_small(match_info, puuid)
         socketio.emit("append-match-history", info)
+    """
 
 def query_account_info(name, tag):
     url_ext = f"/v1/account/{name}/{tag}"
     params = {
         "api_key": api_key
     }
-    response = requests.get(URL_BASE + url_ext, params)
+    #response = requests.get(URL_BASE + url_ext, params)
+    response = query_get(URL_BASE + url_ext, params)
     return response.json()
 
 def query_match_history(puuid, region, start_index, end_index):
@@ -101,7 +119,8 @@ def query_match_history(puuid, region, start_index, end_index):
         "queries": f"?startIndex={start_index}&endIndex={end_index}"
         #"queries": f"?startIndex={start_index}&endIndex={end_index}&queue={queue}"
     }
-    response = requests.post(URL_BASE + url_ext, headers=headers, json=data)
+    #response = requests.post(URL_BASE + url_ext, headers=headers, json=data)
+    response = query_post(URL_BASE + url_ext, headers, data)
     return response.json()
     
 def query_match_info(match_id):
@@ -109,7 +128,8 @@ def query_match_info(match_id):
     params = {
         "api_key": api_key
     }
-    response = requests.get(URL_BASE + url_ext, params)
+    #response = requests.get(URL_BASE + url_ext, params)
+    response = query_get(URL_BASE + url_ext, params)
     return response.json()
 
 # filter through match info and extract only information that is relevent to show on the frontend.
@@ -150,6 +170,42 @@ def get_relevent_info_large(match_info):
 
     #print(info)
     return info
+
+
+def query_get(url, params):
+    for i in range(5):
+        response = requests.get(url, params)
+
+        if response.status_code == 429:
+            print(response.json())
+            print(response.headers)
+            print(f"rate limited while trying {url}. waiting {RATE_LIMIT_SLEEP_TIME} second and retrying")
+            time.sleep(RATE_LIMIT_SLEEP_TIME)
+        elif response.status_code == 200:
+            break
+        else:
+            print("UNEXPECTED RESPONSE:", response, response.reason)
+            break
+    return response
+
+
+
+def query_post(url, headers, json):
+    for i in range(5):
+        response = requests.post(url, headers=headers, json=json)
+
+        if response.status_code == 429:
+            print(response.json())
+            print(response.headers)
+            print(f"rate limited while trying {url}. waiting {RATE_LIMIT_SLEEP_TIME} second and retrying")
+            time.sleep(RATE_LIMIT_SLEEP_TIME)
+        elif response.status_code == 200:
+            break
+        else:
+            print("UNEXPECTED RESPONSE:", response, response.reason)
+            break
+    return response
+
 
 if __name__ == "__main__":
     #print("api key:", api_key)
