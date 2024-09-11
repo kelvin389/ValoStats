@@ -91,6 +91,14 @@
             socket.emit("load-init-matches", username);
         });
 
+        $("#username-submit").click(function () {
+            let username = $("#username-input").val();
+
+            let url = new URL("{{ url_for('match_history') }}", window.location.origin);
+            url.searchParams.append("username", username);
+            window.location.href = url;
+        });
+
         socket.on("append-match-history", function(info) {
             // calculate how long ago this game took place
             let start_date = new Date(info.start_time);
@@ -296,6 +304,8 @@
 
 <body>
     <h1><a href="{{ url_for('index') }}">HOME</a></h1>
+    <h3>Username: <input type="text" id="username-input" placeholder="eg. username#NA1">
+    <button id="username-submit">Submit</button></h3>
     <h4>queue type:
     <select id="queue-type">
         <option value="">all</option>
@@ -303,6 +313,7 @@
         <option value="premier">premier</option>
     </select>
     </h4>
+    <h1 class="d-flex justify-content-center">{{ username }}</h1>
     <div class="container py-2" id="main-container">
         <div id="matches-container">
 

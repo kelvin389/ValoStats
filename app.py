@@ -26,7 +26,8 @@ def index():
 
 @app.route("/match_history")
 def match_history():
-    return render_template("match_history.html")
+    username = request.args.get("username")
+    return render_template("match_history.html", username=username)
 
 @socketio.on("load-init-matches")
 def change_puuid(username):
