@@ -72,7 +72,7 @@
             27: "{{ url_for('static', filename='images/rank_icons/27.png') }}",
     };
 
-    const eco_max_value = 16000;
+    const eco_max_value = 10000;
 
     $(document).ready(function() {
         // initialize socket
@@ -278,7 +278,7 @@
         function generate_row_html(player, info, eco_frags) {
             row_html = `
                 <div class="col-1"><img src="${image_paths[player.character.toLowerCase()]}" class="overlay-agent-icon"/></div> 
-                <div class="col-2">${player.name}#${player.tag}</div>
+                <div class="col-2"><a href="{{ url_for("match_history") }}?username=${player.name}%23${player.tag}">${player.name}#${player.tag}</a></div>
                 <div class="col-1"><img src="${image_paths[player.currenttier]}" class="overlay-rank-icon"/></div>
                 <div class="col-1">${Math.round(player.stats.score / info.num_rounds)}</div>
                 <div class="col-1">${player.stats.kills} | ${eco_frags[player.puuid]}</div>
@@ -310,7 +310,7 @@
         <div id="loading">
             <h2>loading matches...</h2>
         </div>
-        <div>
+        <div class="justify-content-center d-flex">
             <button id="load-more-button">load more</button>
         </div>
         <!--
@@ -366,9 +366,9 @@
                     <div class="col-2"></div>
                     <div class="col-1"></div>
                     <div class="col-1">ACS</div>
-                    <div class="col-1">K</div>
-                    <div class="col-1">D</div>
-                    <div class="col-1">A</div>
+                    <div class="col-1">Kills | Ecos</div>
+                    <div class="col-1">Deaths</div>
+                    <div class="col-1">Assists</div>
                     <div class="col-1">ADR</div>
                     <div class="col-1">HS%</div>
                 </div>

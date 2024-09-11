@@ -133,7 +133,7 @@ def query_match_info(match_id):
     return response.json()
 
 # filter through match info and extract only information that is relevent to show on the frontend.
-# this reduces the amount of data being sent through socketio due to the majority of match info being useless
+# this reduces the amount of data being sent through socketio due to the majority of match info being useless (for my use case)
 def get_relevent_info_small(match_info, puuid):
     #f = open("data.txt", "w")
     #f.write(json.dumps(match_info))
@@ -149,8 +149,12 @@ def get_relevent_info_small(match_info, puuid):
             info["character"] = player["character"].lower()
             info["tier"] = player["currenttier"]
             info["stats"] = player["stats"]
+
             team_name = player["team"].lower()
-            info["team_info"] = match_info["teams"][team_name]
+            if (info["mode"].lower() != "deathmatch"):
+                info["team_info"] = match_info["teams"][team_name]
+            else:
+                info["team_info"] = {}
             break
     
     #print(info)
