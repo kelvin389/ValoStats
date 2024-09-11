@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match History</title>
+<!-- socketio -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
+<!-- jquery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<!-- bootstrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- stylesheet -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/match_history.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+<link rel="stylesheet" href="match_history.css">
+<script>
+    const image_paths = {
+            brimstone: "{{ url_for('static', filename='images/agent_icons/brimstone.png') }}",
+            viper: "{{ url_for('static', filename='images/agent_icons/viper.png') }}",
+            omen: "{{ url_for('static', filename='images/agent_icons/omen.png') }}",
+            killjoy: "{{ url_for('static', filename='images/agent_icons/killjoy.png') }}",
+            cypher: "{{ url_for('static', filename='images/agent_icons/cypher.png') }}",
+            sova: "{{ url_for('static', filename='images/agent_icons/sova.png') }}",
+            sage: "{{ url_for('static', filename='images/agent_icons/sage.png') }}",
+            phoenix: "{{ url_for('static', filename='images/agent_icons/phoenix.png') }}",
+            jett: "{{ url_for('static', filename='images/agent_icons/jett.png') }}",
+            reyna: "{{ url_for('static', filename='images/agent_icons/reyna.png') }}",
+            raze: "{{ url_for('static', filename='images/agent_icons/raze.png') }}",
+            breach: "{{ url_for('static', filename='images/agent_icons/breach.png') }}",
+            skye: "{{ url_for('static', filename='images/agent_icons/skye.png') }}",
+            yoru: "{{ url_for('static', filename='images/agent_icons/yoru.png') }}",
+            astra: "{{ url_for('static', filename='images/agent_icons/astra.png') }}",
+            "kay/o": "{{ url_for('static', filename='images/agent_icons/kayo.png') }}",
+            chamber: "{{ url_for('static', filename='images/agent_icons/chamber.png') }}",
+            neon: "{{ url_for('static', filename='images/agent_icons/neon.png') }}",
+            fade: "{{ url_for('static', filename='images/agent_icons/fade.png') }}",
+            harbor: "{{ url_for('static', filename='images/agent_icons/harbor.png') }}",
+            gekko: "{{ url_for('static', filename='images/agent_icons/gekko.png') }}",
+            deadlock: "{{ url_for('static', filename='images/agent_icons/deadlock.png') }}",
+            iso: "{{ url_for('static', filename='images/agent_icons/iso.png') }}",
+            clove: "{{ url_for('static', filename='images/agent_icons/clove.png') }}",
+            vyse: "{{ url_for('static', filename='images/agent_icons/vyse.png') }}",
+            1: "{{ url_for('static', filename='images/rank_icons/1.png') }}",
+            2: "{{ url_for('static', filename='images/rank_icons/2.png') }}",
+            3: "{{ url_for('static', filename='images/rank_icons/3.png') }}",
+            4: "{{ url_for('static', filename='images/rank_icons/4.png') }}",
+            5: "{{ url_for('static', filename='images/rank_icons/5.png') }}",
+            6: "{{ url_for('static', filename='images/rank_icons/6.png') }}",
+            7: "{{ url_for('static', filename='images/rank_icons/7.png') }}",
+            8: "{{ url_for('static', filename='images/rank_icons/8.png') }}",
+            9: "{{ url_for('static', filename='images/rank_icons/9.png') }}",
+            10: "{{ url_for('static', filename='images/rank_icons/10.png') }}",
+            11: "{{ url_for('static', filename='images/rank_icons/11.png') }}",
+            12: "{{ url_for('static', filename='images/rank_icons/12.png') }}",
+            13: "{{ url_for('static', filename='images/rank_icons/13.png') }}",
+            14: "{{ url_for('static', filename='images/rank_icons/14.png') }}",
+            15: "{{ url_for('static', filename='images/rank_icons/15.png') }}",
+            16: "{{ url_for('static', filename='images/rank_icons/16.png') }}",
+            17: "{{ url_for('static', filename='images/rank_icons/17.png') }}",
+            18: "{{ url_for('static', filename='images/rank_icons/18.png') }}",
+            19: "{{ url_for('static', filename='images/rank_icons/19.png') }}",
+            20: "{{ url_for('static', filename='images/rank_icons/20.png') }}",
+            21: "{{ url_for('static', filename='images/rank_icons/21.png') }}",
+            22: "{{ url_for('static', filename='images/rank_icons/22.png') }}",
+            23: "{{ url_for('static', filename='images/rank_icons/23.png') }}",
+            24: "{{ url_for('static', filename='images/rank_icons/24.png') }}",
+            25: "{{ url_for('static', filename='images/rank_icons/25.png') }}",
+            26: "{{ url_for('static', filename='images/rank_icons/26.png') }}",
+            27: "{{ url_for('static', filename='images/rank_icons/27.png') }}",
+    };
+
+    $(document).ready(function() {
+        // initialize socket
+        var socket = io();
+
+        // overlay is enabled by default in the HTML. TODO: change this
+        hide_overlay();
+
+        socket.on("connect", function() {
+            console.log("[Match History]: Connected to server");
+
+            // get username parameter from search bar
+            search_params = new URLSearchParams(window.location.search);
+            let username = search_params.get("username");
+
+            socket.emit("load-init-matches", username);
+        });
+
+        socket.on("append-match-history", function(info) {
+            // calculate how long ago this game took place
+            let start_date = new Date(info.start_time);
+            let cur_date = new Date();
+
+            diff_in_ms = cur_date - start_date;
+            let diff_in_seconds = Math.floor(diff_in_ms / 1000);
+            let diff_in_minutes = Math.floor(diff_in_seconds / 60);
+            let diff_in_hours = Math.floor(diff_in_minutes / 60);
+            let diff_in_days = Math.floor(diff_in_hours / 24);
+
+            let time_ago_str = "";
+            if (diff_in_days > 0) {
+                time_ago_str = diff_in_days + " days ago";
+            } else if (diff_in_hours > 0) {
+                time_ago_str = diff_in_hours + " hrs ago";
+            } else if (diff_in_minutes > 0) {
+                time_ago_str = diff_in_minutes + " min ago";
+            } else {
+                time_ago_str = diff_in_seconds + " sec ago";
+            }
+            
+            // create match html structure
+            let match_div = document.createElement("div");
+            match_div.classList.add("match", "flex-row", "d-flex", "justify-content-center", "my-1");
+
+            // match data html structure
+            let match_data_div = document.createElement("div");
+            match_data_div.classList.add("match-data", "p-2");
+            // add matchid as id. this will be used if the user clicks on the match
+            match_data_div.setAttribute("id", info.match_id);
+
+            // add appropriate css class based on whether the player won or not
+            (info.team_info.has_won ? match_data_div.classList.add("win") : match_data_div.classList.add("loss"));
+
+            // generate html for a match
+            match_data_div.innerHTML = `
+                <img src="${image_paths[info.tier]}" class="rank-icon img-fluid"/>
+                <img src="${image_paths[info.character]}" class="agent-icon img-fluid"/>
+                <span class="gamemode">${info.mode}</span>
+                <span class="time">${time_ago_str}</span>
+                <span class="map-name">${info.map}</span>
+                <span class="score">${info.team_info.rounds_won}:${info.team_info.rounds_lost}</span>
+                <span class="KDA">${info.stats.kills}/${info.stats.deaths}/${info.stats.assists}</span>
+            `;
+
+            let container = $("#matches-container");
+            match_div.append(match_data_div);
+            container.append(match_div);
+        });
+
+        socket.on("show-loading", function() {
+            $("#loading").show();
+        });
+
+        socket.on("hide-loading", function() {
+            $("#loading").hide();
+        });
+
+        socket.on("display-specific-match", function(info) {
+            let red_team_container = $("#red_team");
+            let blue_team_container = $("#blue_team");
+            // clear loading text
+            red_team_container.empty();
+            blue_team_container.empty();
+
+            console.log(info);
+
+            for (let i = 0; i < info.players_red.length; i++) {
+                let player = info.players_red[i];
+                let row = document.createElement("div");
+                row.classList.add("row");
+
+                row.innerHTML = `
+                    <div class="col-1"><img src="${image_paths[player.character.toLowerCase()]}" class="overlay-agent-icon"/></div> 
+                    <div class="col-2">${player.name}#${player.tag}</div>
+                    <div class="col-1"><img src="${image_paths[player.currenttier]}" class="overlay-rank-icon"/></div>
+                    <div class="col-1">${Math.round(player.stats.score / info.num_rounds)}</div>
+                    <div class="col-1">${player.stats.kills}</div>
+                    <div class="col-1">${player.stats.deaths}</div>
+                    <div class="col-1">${player.stats.assists}</div>
+                    <div class="col-1">${Math.round(player.damage_made / info.num_rounds)}</div>
+                    <div class="col-1">${Math.round(player.stats.headshots / (player.stats.headshots + player.stats.bodyshots + player.stats.legshots) * 100)}%</div>
+                    `
+
+                red_team_container.append(row)
+            }
+
+            for (let i = 0; i < info.players_blue.length; i++) {
+                let player = info.players_blue[i];
+                let row = document.createElement("div");
+                row.classList.add("row");
+
+                row.innerHTML = `
+                    <div class="col-1"><img src="${image_paths[player.character.toLowerCase()]}" class="overlay-agent-icon"/></div> 
+                    <div class="col-2">${player.name}#${player.tag}</div>
+                    <div class="col-1"><img src="${image_paths[player.currenttier]}" class="overlay-rank-icon"/></div>
+                    <div class="col-1">${Math.round(player.stats.score / info.num_rounds)}</div>
+                    <div class="col-1">${player.stats.kills}</div>
+                    <div class="col-1">${player.stats.deaths}</div>
+                    <div class="col-1">${player.stats.assists}</div>
+                    <div class="col-1">${Math.round(player.damage_made / info.num_rounds)}</div>
+                    <div class="col-1">${Math.round(player.stats.headshots / (player.stats.headshots + player.stats.bodyshots + player.stats.legshots) * 100)}%</div>
+                    `
+
+                blue_team_container.append(row)
+            }
+
+        });
+
+        $("#load-more-button").click(function() {
+            socket.emit("load-more-matches");
+        });
+
+        $("#overlay").click(function(event) {
+            // hide if user clicks the dark background but not the overlay box
+            if (event.target == this) {
+                hide_overlay();
+            }
+        });
+
+        function show_overlay() {
+            $("#overlay").show();
+        }
+
+        function hide_overlay() {
+            let red_team_container = $("#red_team");
+            let blue_team_container = $("#blue_team");
+            // empty containers and place loading text when overlay is hidden.
+            // this ensures old data isnt shown next time the overlay is opened
+            red_team_container.empty();
+            blue_team_container.empty();
+            red_team_container.html("loading");
+            blue_team_container.html("loading");
+
+            $("#overlay").hide();
+        }
+
+        $(document).on("click", ".match-data", function(event) {
+            console.log(event);
+            if (event.target == this) {
+                socket.emit("load-specific-match", event.target.id);
+                show_overlay();
+            }
+        });
+    });
+</script>
+</head>
+
+<body>
+    <h1><a href="{{ url_for('index') }}">HOME</a></h1>
+    <h4>queue type:
+    <select id="queue-type">
+        <option value="">all</option>
+        <option value="competitive">comp</option>
+        <option value="premier">premier</option>
+    </select>
+    </h4>
+    <div class="container py-2" id="main-container">
+        <div id="matches-container">
+
+        </div>
+        <div id="loading">
+            <h2>loading matches...</h2>
+        </div>
+        <div>
+            <button id="load-more-button">load more</button>
+        </div>
+        <!--
+        <div class="match flex-row d-flex justify-content-center">
+            <div class="match-data">
+                <img src="{{ url_for('static', filename='images/sage_icon.png') }}" class="agent-icon img-fluid"/>
+                <span class="gamemode">Competitive</span>
+                <span class="time">2h ago</span>
+                <span class="map-name">Haven</span>
+                <img src="{{ url_for('static', filename='images/Ascendant_1_Rank.png') }}" class="rank-icon img-fluid"/>
+                <span class="score">13:8</span>
+                <span class="KDA">13/19/10</span>
+            </div>
+        </div>
+
+        <div class="match flex-row d-flex justify-content-center">
+            <div class="match-data">
+                <img src="{{ url_for('static', filename='images/sage_icon.png') }}" class="agent-icon img-fluid"/>
+                <span class="gamemode">Competitive</span>
+                <span class="time">2h ago</span>
+                <span class="map-name">Haven</span>
+                <img src="{{ url_for('static', filename='images/Ascendant_1_Rank.png') }}" class="rank-icon img-fluid"/>
+                <span class="score">13:8</span>
+                <span class="KDA">13/19/10</span>
+            </div>
+        </div>
+        -->
+
+    </div>
+    <div id="overlay">
+        <div id="overlay-box" class="container">
+            <div class="row">
+                <div class="col-1"></div> 
+                <div class="col-2"></div>
+                <div class="col-1"></div>
+                <div class="col-1">ACS</div>
+                <div class="col-1">K</div>
+                <div class="col-1">D</div>
+                <div class="col-1">A</div>
+                <div class="col-1">ADR</div>
+                <div class="col-1">HS%</div>
+            </div>
+            <div id="red_team">
+
+            <!--
+            <div class="row">
+                <div class="col-1">AGENT ICON</div> 
+                <div class="col-2">PLAYER NAME</div>
+                <div class="col-1">RANK</div>
+                <div class="col-1">ACS</div>
+                <div class="col-1">K</div>
+                <div class="col-1">D</div>
+                <div class="col-1">A</div>
+                <div class="col-1">HS%</div>
+            </div>
+            <div class="row">
+                <div class="col-1">AGENT ICON</div> 
+                <div class="col-2">PLAYER NAME</div>
+                <div class="col-1">RANK</div>
+                <div class="col-1">ACS</div>
+                <div class="col-1">K</div>
+                <div class="col-1">D</div>
+                <div class="col-1">A</div>
+                <div class="col-1">HS%</div>
+            </div>
+            <div class="row">
+                <div class="col-1">AGENT ICON</div> 
+                <div class="col-2">PLAYER NAME</div>
+                <div class="col-1">RANK</div>
+                <div class="col-1">ACS</div>
+                <div class="col-1">K</div>
+                <div class="col-1">D</div>
+                <div class="col-1">A</div>
+                <div class="col-1">HS%</div>
+            </div>
+                -->
+            </div>
+
+            <div id="team-divider" class="my-4"></div>
+
+            <div class="row">
+                <div class="col-1"></div> 
+                <div class="col-2"></div>
+                <div class="col-1"></div>
+                <div class="col-1">ACS</div>
+                <div class="col-1">K</div>
+                <div class="col-1">D</div>
+                <div class="col-1">A</div>
+                <div class="col-1">ADR</div>
+                <div class="col-1">HS%</div>
+            </div>
+            <div id="blue_team">
+
+            <!--
+            <div class="row">
+                <div class="col-1">AGENT ICON</div> 
+                <div class="col-2">PLAYER NAME</div>
+                <div class="col-1">RANK</div>
+                <div class="col-1">ACS</div>
+                <div class="col-1">K</div>
+                <div class="col-1">D</div>
+                <div class="col-1">A</div>
+                <div class="col-1">HS%</div>
+            </div>
+            <div class="row">
+                <div class="col-1">AGENT ICON</div> 
+                <div class="col-2">PLAYER NAME</div>
+                <div class="col-1">RANK</div>
+                <div class="col-1">ACS</div>
+                <div class="col-1">K</div>
+                <div class="col-1">D</div>
+                <div class="col-1">A</div>
+                <div class="col-1">HS%</div>
+            </div>
+            <div class="row">
+                <div class="col-1">AGENT ICON</div> 
+                <div class="col-2">PLAYER NAME</div>
+                <div class="col-1">RANK</div>
+                <div class="col-1">ACS</div>
+                <div class="col-1">K</div>
+                <div class="col-1">D</div>
+                <div class="col-1">A</div>
+                <div class="col-1">HS%</div>
+            </div>
+                -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>

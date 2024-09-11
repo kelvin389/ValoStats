@@ -1,0 +1,4 @@
+textbox with your name
+button that loads match history for you with a list of your games
+click on a game
+checkbox that toggles between viewing the normal scoreboard and scorebaord w/o eco frags
