@@ -1,3 +1,5 @@
+Flask app that allows viewing Valorant stats for recently played matches.
+
 create `.env` file with 2 lines:
 
 `API_KEY=your-api-key-here`
