@@ -7,3 +7,9 @@ create `.env` file with 2 lines:
 `FLASK_SECRET=your-flask-secret-key-here`
 
 More info about the API key on the [HenrikDev GitHub page](https://github.com/Henrik-3/unofficial-valorant-api). The flask secret key is a random string for security.
+
+---
+**Technologies Used**:
+- Flask
+- JQuery
+- Vanilla Python/HTML/CSS/Javascript
