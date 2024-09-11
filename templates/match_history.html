@@ -162,6 +162,9 @@
             blue_team_container.empty();
 
             console.log(info);
+            // sort teams by combat score (ACS)
+            info.players_red.sort((a,b) => b.stats.score - a.stats.score);
+            info.players_blue.sort((a,b) => b.stats.score - a.stats.score);
 
             for (let i = 0; i < info.players_red.length; i++) {
                 let player = info.players_red[i];
