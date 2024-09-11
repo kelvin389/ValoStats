@@ -157,8 +157,8 @@
         });
 
         socket.on("display-specific-match", function(info) {
-            let red_team_container = $("#red_team");
-            let blue_team_container = $("#blue_team");
+            let red_team_container = $("#red_team_players");
+            let blue_team_container = $("#blue_team_players");
             // clear loading text
             red_team_container.empty();
             blue_team_container.empty();
@@ -255,8 +255,8 @@
         }
 
         function hide_overlay() {
-            let red_team_container = $("#red_team");
-            let blue_team_container = $("#blue_team");
+            let red_team_container = $("#red_team_players");
+            let blue_team_container = $("#blue_team_players");
             // empty containers and place loading text when overlay is hidden.
             // this ensures old data isnt shown next time the overlay is opened
             red_team_container.empty();
@@ -342,100 +342,39 @@
     </div>
     <div id="overlay">
         <div id="overlay-box" class="container">
-            <div class="row">
-                <div class="col-1"></div> 
-                <div class="col-2"></div>
-                <div class="col-1"></div>
-                <div class="col-1">ACS</div>
-                <div class="col-1">K</div>
-                <div class="col-1">D</div>
-                <div class="col-1">A</div>
-                <div class="col-1">ADR</div>
-                <div class="col-1">HS%</div>
-            </div>
             <div id="red_team">
-
-            <!--
-            <div class="row">
-                <div class="col-1">AGENT ICON</div> 
-                <div class="col-2">PLAYER NAME</div>
-                <div class="col-1">RANK</div>
-                <div class="col-1">ACS</div>
-                <div class="col-1">K</div>
-                <div class="col-1">D</div>
-                <div class="col-1">A</div>
-                <div class="col-1">HS%</div>
-            </div>
-            <div class="row">
-                <div class="col-1">AGENT ICON</div> 
-                <div class="col-2">PLAYER NAME</div>
-                <div class="col-1">RANK</div>
-                <div class="col-1">ACS</div>
-                <div class="col-1">K</div>
-                <div class="col-1">D</div>
-                <div class="col-1">A</div>
-                <div class="col-1">HS%</div>
-            </div>
-            <div class="row">
-                <div class="col-1">AGENT ICON</div> 
-                <div class="col-2">PLAYER NAME</div>
-                <div class="col-1">RANK</div>
-                <div class="col-1">ACS</div>
-                <div class="col-1">K</div>
-                <div class="col-1">D</div>
-                <div class="col-1">A</div>
-                <div class="col-1">HS%</div>
-            </div>
-                -->
+                <div class="row">
+                    <div class="col-1"></div> 
+                    <div class="col-2"></div>
+                    <div class="col-1"></div>
+                    <div class="col-1">ACS</div>
+                    <div class="col-1">Kills | Ecos</div>
+                    <div class="col-1">Deaths</div>
+                    <div class="col-1">Assists</div>
+                    <div class="col-1">ADR</div>
+                    <div class="col-1">HS%</div>
+                </div>
+                <div id="red_team_players">
+                </div>
             </div>
 
             <div id="team-divider" class="my-4"></div>
 
-            <div class="row">
-                <div class="col-1"></div> 
-                <div class="col-2"></div>
-                <div class="col-1"></div>
-                <div class="col-1">ACS</div>
-                <div class="col-1">K</div>
-                <div class="col-1">D</div>
-                <div class="col-1">A</div>
-                <div class="col-1">ADR</div>
-                <div class="col-1">HS%</div>
-            </div>
             <div id="blue_team">
+                <div class="row">
+                    <div class="col-1"></div> 
+                    <div class="col-2"></div>
+                    <div class="col-1"></div>
+                    <div class="col-1">ACS</div>
+                    <div class="col-1">K</div>
+                    <div class="col-1">D</div>
+                    <div class="col-1">A</div>
+                    <div class="col-1">ADR</div>
+                    <div class="col-1">HS%</div>
+                </div>
+                <div id="blue_team_players">
+                </div>
 
-            <!--
-            <div class="row">
-                <div class="col-1">AGENT ICON</div> 
-                <div class="col-2">PLAYER NAME</div>
-                <div class="col-1">RANK</div>
-                <div class="col-1">ACS</div>
-                <div class="col-1">K</div>
-                <div class="col-1">D</div>
-                <div class="col-1">A</div>
-                <div class="col-1">HS%</div>
-            </div>
-            <div class="row">
-                <div class="col-1">AGENT ICON</div> 
-                <div class="col-2">PLAYER NAME</div>
-                <div class="col-1">RANK</div>
-                <div class="col-1">ACS</div>
-                <div class="col-1">K</div>
-                <div class="col-1">D</div>
-                <div class="col-1">A</div>
-                <div class="col-1">HS%</div>
-            </div>
-            <div class="row">
-                <div class="col-1">AGENT ICON</div> 
-                <div class="col-2">PLAYER NAME</div>
-                <div class="col-1">RANK</div>
-                <div class="col-1">ACS</div>
-                <div class="col-1">K</div>
-                <div class="col-1">D</div>
-                <div class="col-1">A</div>
-                <div class="col-1">HS%</div>
-            </div>
-                -->
             </div>
         </div>
     </div>
