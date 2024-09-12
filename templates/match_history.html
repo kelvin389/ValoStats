@@ -276,24 +276,22 @@
         }
 
         $(document).on("click", ".match-data", function(event) {
-            console.log(event);
-            if (event.target == this) {
-                socket.emit("load-specific-match", event.target.id);
-                show_overlay();
-            }
+            socket.emit("load-specific-match", event.target.id);
+            show_overlay();
         });
 
         function generate_row_html(player, info, eco_frags) {
             row_html = `
                 <div class="col-1"><img src="${image_paths[player.character.toLowerCase()]}" class="overlay-agent-icon"/></div> 
-                <div class="col-2"><a href="{{ url_for("match_history") }}?username=${player.name}%23${player.tag}">${player.name}#${player.tag}</a></div>
+                <div class="col-2"><a href="{{ url_for("match_history") }}?username=${player.name}%23${player.tag}" class="player-name-link">${player.name}#${player.tag}</a></div>
                 <div class="col-1"><img src="${image_paths[player.currenttier]}" class="overlay-rank-icon"/></div>
                 <div class="col-1">${Math.round(player.stats.score / info.num_rounds)}</div>
-                <div class="col-1">${player.stats.kills} | ${eco_frags[player.puuid]}</div>
+                <div class="col-1">${player.stats.kills}</div>
                 <div class="col-1">${player.stats.deaths}</div>
                 <div class="col-1">${player.stats.assists}</div>
                 <div class="col-1">${Math.round(player.damage_made / info.num_rounds)}</div>
                 <div class="col-1">${Math.round(player.stats.headshots / (player.stats.headshots + player.stats.bodyshots + player.stats.legshots) * 100)}%</div>
+                <div class="col-1">${eco_frags[player.puuid]}</div>
                 `;
             return row_html;
         }
@@ -334,11 +332,12 @@
                     <div class="col-2"></div>
                     <div class="col-1"></div>
                     <div class="col-1">ACS</div>
-                    <div class="col-1">Kills | Ecos</div>
+                    <div class="col-1">Kills</div>
                     <div class="col-1">Deaths</div>
                     <div class="col-1">Assists</div>
                     <div class="col-1">ADR</div>
                     <div class="col-1">HS%</div>
+                    <div class="col-1">Eco Frags</div>
                 </div>
                 <div id="red_team_players">
                 </div>
@@ -352,11 +351,12 @@
                     <div class="col-2"></div>
                     <div class="col-1"></div>
                     <div class="col-1">ACS</div>
-                    <div class="col-1">Kills | Ecos</div>
+                    <div class="col-1">Kills</div>
                     <div class="col-1">Deaths</div>
                     <div class="col-1">Assists</div>
                     <div class="col-1">ADR</div>
                     <div class="col-1">HS%</div>
+                    <div class="col-1">Eco Frags</div>
                 </div>
                 <div id="blue_team_players">
                 </div>

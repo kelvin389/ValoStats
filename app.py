@@ -10,6 +10,7 @@ from flask_socketio import SocketIO, emit
 
 URL_BASE = "https://api.henrikdev.xyz/valorant"
 RATE_LIMIT_SLEEP_TIME = 60
+MATCHES_PER_LOAD = 5
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -41,7 +42,7 @@ def change_puuid(username):
     global end
     puuid = query_account_info(name, tag)["data"]["puuid"]
     start = 0
-    end = 5
+    end = MATCHES_PER_LOAD
     load_more_matches()
 
 @socketio.on("load-more-matches")
@@ -50,8 +51,8 @@ def load_more_matches():
     global start
     global end
     load_match_history(puuid, start, end)
-    start += 5
-    end += 5
+    start += MATCHES_PER_LOAD
+    end += MATCHES_PER_LOAD
 
 # TODO: this queries the match again. the previously queried data can probably just be used for efficiency
 @socketio.on("load-specific-match")
@@ -179,6 +180,7 @@ def get_relevent_info_large(match_info):
 
 
 def query_get(url, params):
+    # retry 5 times then just give up
     for i in range(5):
         response = requests.get(url, params)
 
@@ -197,6 +199,7 @@ def query_get(url, params):
 
 
 def query_post(url, headers, json):
+    # retry 5 times then just give up
     for i in range(5):
         response = requests.post(url, headers=headers, json=json)
 
