@@ -17,59 +17,59 @@
 <link rel="stylesheet" href="match_history.css">
 <script>
     const image_paths = {
-            brimstone: "{{ url_for('static', filename='images/agent_icons/brimstone.png') }}",
-            viper: "{{ url_for('static', filename='images/agent_icons/viper.png') }}",
-            omen: "{{ url_for('static', filename='images/agent_icons/omen.png') }}",
-            killjoy: "{{ url_for('static', filename='images/agent_icons/killjoy.png') }}",
-            cypher: "{{ url_for('static', filename='images/agent_icons/cypher.png') }}",
-            sova: "{{ url_for('static', filename='images/agent_icons/sova.png') }}",
-            sage: "{{ url_for('static', filename='images/agent_icons/sage.png') }}",
-            phoenix: "{{ url_for('static', filename='images/agent_icons/phoenix.png') }}",
-            jett: "{{ url_for('static', filename='images/agent_icons/jett.png') }}",
-            reyna: "{{ url_for('static', filename='images/agent_icons/reyna.png') }}",
-            raze: "{{ url_for('static', filename='images/agent_icons/raze.png') }}",
-            breach: "{{ url_for('static', filename='images/agent_icons/breach.png') }}",
-            skye: "{{ url_for('static', filename='images/agent_icons/skye.png') }}",
-            yoru: "{{ url_for('static', filename='images/agent_icons/yoru.png') }}",
-            astra: "{{ url_for('static', filename='images/agent_icons/astra.png') }}",
-            "kay/o": "{{ url_for('static', filename='images/agent_icons/kayo.png') }}",
-            chamber: "{{ url_for('static', filename='images/agent_icons/chamber.png') }}",
-            neon: "{{ url_for('static', filename='images/agent_icons/neon.png') }}",
-            fade: "{{ url_for('static', filename='images/agent_icons/fade.png') }}",
-            harbor: "{{ url_for('static', filename='images/agent_icons/harbor.png') }}",
-            gekko: "{{ url_for('static', filename='images/agent_icons/gekko.png') }}",
-            deadlock: "{{ url_for('static', filename='images/agent_icons/deadlock.png') }}",
-            iso: "{{ url_for('static', filename='images/agent_icons/iso.png') }}",
-            clove: "{{ url_for('static', filename='images/agent_icons/clove.png') }}",
-            vyse: "{{ url_for('static', filename='images/agent_icons/vyse.png') }}",
-            0: "{{ url_for('static', filename='images/rank_icons/0.png') }}",
-            1: "{{ url_for('static', filename='images/rank_icons/1.png') }}",
-            2: "{{ url_for('static', filename='images/rank_icons/2.png') }}",
-            3: "{{ url_for('static', filename='images/rank_icons/3.png') }}",
-            4: "{{ url_for('static', filename='images/rank_icons/4.png') }}",
-            5: "{{ url_for('static', filename='images/rank_icons/5.png') }}",
-            6: "{{ url_for('static', filename='images/rank_icons/6.png') }}",
-            7: "{{ url_for('static', filename='images/rank_icons/7.png') }}",
-            8: "{{ url_for('static', filename='images/rank_icons/8.png') }}",
-            9: "{{ url_for('static', filename='images/rank_icons/9.png') }}",
-            10: "{{ url_for('static', filename='images/rank_icons/10.png') }}",
-            11: "{{ url_for('static', filename='images/rank_icons/11.png') }}",
-            12: "{{ url_for('static', filename='images/rank_icons/12.png') }}",
-            13: "{{ url_for('static', filename='images/rank_icons/13.png') }}",
-            14: "{{ url_for('static', filename='images/rank_icons/14.png') }}",
-            15: "{{ url_for('static', filename='images/rank_icons/15.png') }}",
-            16: "{{ url_for('static', filename='images/rank_icons/16.png') }}",
-            17: "{{ url_for('static', filename='images/rank_icons/17.png') }}",
-            18: "{{ url_for('static', filename='images/rank_icons/18.png') }}",
-            19: "{{ url_for('static', filename='images/rank_icons/19.png') }}",
-            20: "{{ url_for('static', filename='images/rank_icons/20.png') }}",
-            21: "{{ url_for('static', filename='images/rank_icons/21.png') }}",
-            22: "{{ url_for('static', filename='images/rank_icons/22.png') }}",
-            23: "{{ url_for('static', filename='images/rank_icons/23.png') }}",
-            24: "{{ url_for('static', filename='images/rank_icons/24.png') }}",
-            25: "{{ url_for('static', filename='images/rank_icons/25.png') }}",
-            26: "{{ url_for('static', filename='images/rank_icons/26.png') }}",
-            27: "{{ url_for('static', filename='images/rank_icons/27.png') }}",
+        brimstone: "{{ url_for('static', filename='images/agent_icons/brimstone.png') }}",
+        viper: "{{ url_for('static', filename='images/agent_icons/viper.png') }}",
+        omen: "{{ url_for('static', filename='images/agent_icons/omen.png') }}",
+        killjoy: "{{ url_for('static', filename='images/agent_icons/killjoy.png') }}",
+        cypher: "{{ url_for('static', filename='images/agent_icons/cypher.png') }}",
+        sova: "{{ url_for('static', filename='images/agent_icons/sova.png') }}",
+        sage: "{{ url_for('static', filename='images/agent_icons/sage.png') }}",
+        phoenix: "{{ url_for('static', filename='images/agent_icons/phoenix.png') }}",
+        jett: "{{ url_for('static', filename='images/agent_icons/jett.png') }}",
+        reyna: "{{ url_for('static', filename='images/agent_icons/reyna.png') }}",
+        raze: "{{ url_for('static', filename='images/agent_icons/raze.png') }}",
+        breach: "{{ url_for('static', filename='images/agent_icons/breach.png') }}",
+        skye: "{{ url_for('static', filename='images/agent_icons/skye.png') }}",
+        yoru: "{{ url_for('static', filename='images/agent_icons/yoru.png') }}",
+        astra: "{{ url_for('static', filename='images/agent_icons/astra.png') }}",
+        "kay/o": "{{ url_for('static', filename='images/agent_icons/kayo.png') }}",
+        chamber: "{{ url_for('static', filename='images/agent_icons/chamber.png') }}",
+        neon: "{{ url_for('static', filename='images/agent_icons/neon.png') }}",
+        fade: "{{ url_for('static', filename='images/agent_icons/fade.png') }}",
+        harbor: "{{ url_for('static', filename='images/agent_icons/harbor.png') }}",
+        gekko: "{{ url_for('static', filename='images/agent_icons/gekko.png') }}",
+        deadlock: "{{ url_for('static', filename='images/agent_icons/deadlock.png') }}",
+        iso: "{{ url_for('static', filename='images/agent_icons/iso.png') }}",
+        clove: "{{ url_for('static', filename='images/agent_icons/clove.png') }}",
+        vyse: "{{ url_for('static', filename='images/agent_icons/vyse.png') }}",
+        0: "{{ url_for('static', filename='images/rank_icons/0.png') }}",
+        1: "{{ url_for('static', filename='images/rank_icons/1.png') }}",
+        2: "{{ url_for('static', filename='images/rank_icons/2.png') }}",
+        3: "{{ url_for('static', filename='images/rank_icons/3.png') }}",
+        4: "{{ url_for('static', filename='images/rank_icons/4.png') }}",
+        5: "{{ url_for('static', filename='images/rank_icons/5.png') }}",
+        6: "{{ url_for('static', filename='images/rank_icons/6.png') }}",
+        7: "{{ url_for('static', filename='images/rank_icons/7.png') }}",
+        8: "{{ url_for('static', filename='images/rank_icons/8.png') }}",
+        9: "{{ url_for('static', filename='images/rank_icons/9.png') }}",
+        10: "{{ url_for('static', filename='images/rank_icons/10.png') }}",
+        11: "{{ url_for('static', filename='images/rank_icons/11.png') }}",
+        12: "{{ url_for('static', filename='images/rank_icons/12.png') }}",
+        13: "{{ url_for('static', filename='images/rank_icons/13.png') }}",
+        14: "{{ url_for('static', filename='images/rank_icons/14.png') }}",
+        15: "{{ url_for('static', filename='images/rank_icons/15.png') }}",
+        16: "{{ url_for('static', filename='images/rank_icons/16.png') }}",
+        17: "{{ url_for('static', filename='images/rank_icons/17.png') }}",
+        18: "{{ url_for('static', filename='images/rank_icons/18.png') }}",
+        19: "{{ url_for('static', filename='images/rank_icons/19.png') }}",
+        20: "{{ url_for('static', filename='images/rank_icons/20.png') }}",
+        21: "{{ url_for('static', filename='images/rank_icons/21.png') }}",
+        22: "{{ url_for('static', filename='images/rank_icons/22.png') }}",
+        23: "{{ url_for('static', filename='images/rank_icons/23.png') }}",
+        24: "{{ url_for('static', filename='images/rank_icons/24.png') }}",
+        25: "{{ url_for('static', filename='images/rank_icons/25.png') }}",
+        26: "{{ url_for('static', filename='images/rank_icons/26.png') }}",
+        27: "{{ url_for('static', filename='images/rank_icons/27.png') }}",
     };
 
     const eco_max_value = 10000;
@@ -78,7 +78,7 @@
         // initialize socket
         var socket = io();
 
-        // overlay is enabled by default in the HTML. TODO: change this
+        // overlay is enabled by default in the HTML. TODO: change this because the overlay flashes on screen
         hide_overlay();
 
         socket.on("connect", function() {
@@ -88,9 +88,11 @@
             search_params = new URLSearchParams(window.location.search);
             let username = search_params.get("username");
 
+            // initialize backend and load matches
             socket.emit("load-init-matches", username);
         });
 
+        // get match history for another user on button click
         $("#username-submit").click(function () {
             let username = $("#username-input").val();
 
@@ -164,6 +166,7 @@
             $("#load-more-button").show();
         });
 
+        // triggered when a match is clicked on and the backend responds with full match data
         socket.on("display-specific-match", function(info) {
             let red_team_container = $("#red_team_players");
             let blue_team_container = $("#blue_team_players");
@@ -180,7 +183,6 @@
                 if (i == 0 || i == 12) {
                     continue;
                 }
-
 
                 // get loadout value for each team
                 for (let j = 0; j < info.rounds[i].player_stats.length; j++) {

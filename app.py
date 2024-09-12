@@ -5,8 +5,8 @@ import time
 from dotenv import load_dotenv
 from os import getenv
 # flask
-from flask import Flask, request, render_template, redirect, url_for, jsonify
-from flask_socketio import SocketIO, emit
+from flask import Flask, request, render_template
+from flask_socketio import SocketIO
 
 URL_BASE = "https://api.henrikdev.xyz/valorant"
 RATE_LIMIT_SLEEP_TIME = 60
