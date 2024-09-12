@@ -276,7 +276,7 @@
         }
 
         $(document).on("click", ".match-data", function(event) {
-            socket.emit("load-specific-match", event.target.id);
+            socket.emit("load-specific-match", this.id);
             show_overlay();
         });
 
