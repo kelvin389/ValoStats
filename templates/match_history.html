@@ -275,7 +275,9 @@
             $("#overlay").hide();
         }
 
-        $(document).on("click", ".match-data", function(event) {
+        $(document).on("click", ".match-data", function() {
+            // "this" refers to the .match-data element.
+            // event.target may be child elements so we pull id from "this" instead
             socket.emit("load-specific-match", this.id);
             show_overlay();
         });
