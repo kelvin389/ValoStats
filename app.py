@@ -6,11 +6,10 @@ from dotenv import load_dotenv
 from os import getenv
 # flask
 from flask import Flask, request, render_template
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, emit, join_room, leave_room
 
 URL_BASE = "https://api.henrikdev.xyz/valorant"
 RATE_LIMIT_SLEEP_TIME = 60
-MATCHES_PER_LOAD = 5
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -30,40 +29,43 @@ def match_history():
     username = request.args.get("username")
     return render_template("match_history.html", username=username)
 
+@socketio.on("connect")
+def connect():
+    room = request.sid
+    join_room(room)
+    print(f"client joined room {room}")
+    
+@socketio.on("disconnect")
+def disconnect():
+    room = request.sid
+    leave_room(room)
+    print(f"client joined room {room}")
+
 @socketio.on("load-init-matches")
-def change_puuid(username):
+def load_init_matches(username, start, end):
     pieces = username.split("#")
     name = pieces[0]
     tag = pieces[1]
 
     # reset start and end when puuid changes
-    global puuid
-    global start
-    global end
     puuid = query_account_info(name, tag)["data"]["puuid"]
-    start = 0
-    end = MATCHES_PER_LOAD
-    load_more_matches()
+    load_more_matches(puuid, start, end)
+    emit("set-puuid", puuid, to=request.sid)
 
 @socketio.on("load-more-matches")
-def load_more_matches():
-    global puuid
-    global start
-    global end
+def load_more_matches(puuid, start, end):
     load_match_history(puuid, start, end)
-    start += MATCHES_PER_LOAD
-    end += MATCHES_PER_LOAD
 
 # TODO: this queries the match again. the previously queried data can probably just be used for efficiency
 @socketio.on("load-specific-match")
 def load_specific_match(match_id): 
     match_info = query_match_info(match_id)["data"]
     info = get_relevent_info_large(match_info)
-    socketio.emit("display-specific-match", info)
+    emit("display-specific-match", info, to=request.sid)
 
 def load_match_history(puuid, start_index, end_index):
     # show loading text on page
-    socketio.emit("show-loading")
+    emit("show-loading", to=request.sid)
 
     # query API for MatchID of recent matches
     data = query_match_history(puuid, "na", start_index, end_index)
@@ -74,8 +76,8 @@ def load_match_history(puuid, start_index, end_index):
         id = match["MatchID"]
         match_info = query_match_info(id)["data"]
         info = get_relevent_info_small(match_info, puuid)
-        socketio.emit("append-match-history", info)
-    socketio.emit("hide-loading")
+        emit("append-match-history", info, to=request.sid)
+    emit("hide-loading", to=request.sid)
 
 
     # code below loads the matches in batches.
@@ -90,12 +92,12 @@ def load_match_history(puuid, start_index, end_index):
         match_infos.append(info)
 
     # hide loading text just before the content is sent and shown
-    socketio.emit("hide-loading")
+    emit("hide-loading")
 
     # filter by useful data and send to frontend
     for match_info in match_infos:
         info = get_relevent_info_small(match_info, puuid)
-        socketio.emit("append-match-history", info)
+        emit("append-match-history", info)
     """
 
 def query_account_info(name, tag):

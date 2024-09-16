@@ -76,7 +76,15 @@
 
     $(document).ready(function() {
         // initialize socket
-        var socket = io();
+        let socket = io();
+
+        // puuid of the user currently being viewed.
+        // gets set when matches are initially loaded
+        let puuid = "";
+        let start = -1;
+        let end = -1;
+
+        const matches_per_load = 5;
 
         // overlay is enabled by default in the HTML. TODO: change this because the overlay flashes on screen
         hide_overlay();
@@ -88,8 +96,14 @@
             search_params = new URLSearchParams(window.location.search);
             let username = search_params.get("username");
 
-            // initialize backend and load matches
-            socket.emit("load-init-matches", username);
+            // initialize start/end and load matches
+            start = 0;
+            end = matches_per_load;
+            socket.emit("load-init-matches", username, start, end);
+        });
+
+        socket.on("set-puuid", function(new_puuid) {
+            puuid = new_puuid;
         });
 
         // get match history for another user on button click
@@ -250,7 +264,7 @@
         });
 
         $("#load-more-button").click(function() {
-            socket.emit("load-more-matches");
+            socket.emit("load-more-matches", puuid, start, end);
         });
 
         $("#overlay").click(function(event) {
