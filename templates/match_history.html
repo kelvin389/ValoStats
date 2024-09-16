@@ -72,9 +72,10 @@
         27: "{{ url_for('static', filename='images/rank_icons/27.png') }}",
     };
 
-    const eco_max_value = 10000;
-
     $(document).ready(function() {
+        const eco_max_value = 10000;
+        const matches_per_load = 5;
+
         // initialize socket
         let socket = io();
 
@@ -86,8 +87,6 @@
         // gets incremented as pages of matches are loaded
         let start = -1;
         let end = -1;
-        
-        const matches_per_load = 5;
 
         // id of the match currently or most recently displayed in overlay.
         // prevents problem where user can open a match in the overlay then
