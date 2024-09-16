@@ -125,7 +125,6 @@ def query_match_history(puuid, region, start_index, end_index):
     }
     #response = requests.post(URL_BASE + url_ext, headers=headers, json=data)
     response = query_post(URL_BASE + url_ext, headers, data)
-    print(response.json())
     return response.json()
     
 def query_match_info(match_id):
@@ -156,10 +155,23 @@ def get_relevent_info_small(match_info, puuid):
             info["stats"] = player["stats"]
 
             team_name = player["team"].lower()
-            if (info["mode"].lower() != "deathmatch"):
-                info["team_info"] = match_info["teams"][team_name]
+            if (info["mode"].lower() == "deathmatch"):
+                won = True if match_info["rounds"][0]["winning_team"] == puuid else False
+
+                player_stats = None
+                max_non_self_kills = -1
+                for stats in match_info["rounds"][0]["player_stats"]:
+                    # find player object for the player being looked up
+                    if stats["player_puuid"] == puuid:
+                        player_stats = stats
+                    
+                    if stats != player_stats:
+                        max_non_self_kills = max(stats["kills"], max_non_self_kills)
+
+                kills = player_stats["kills"]
+                info["team_info"] = {"has_won": won, "rounds_won": kills, "rounds_lost": max_non_self_kills}
             else:
-                info["team_info"] = {}
+                info["team_info"] = match_info["teams"][team_name]
             break
     
     #print(info)
@@ -175,8 +187,11 @@ def get_relevent_info_large(match_info):
     info["rounds"] = match_info["rounds"]
     info["num_rounds"] = len(match_info["rounds"])
 
-    info["players_red"] = match_info["players"]["red"]
-    info["players_blue"] = match_info["players"]["blue"]
+    if info["mode"].lower() == "deathmatch":
+        info["players_dm"] = match_info["players"]["all_players"]
+    else:
+        info["players_red"] = match_info["players"]["red"]
+        info["players_blue"] = match_info["players"]["blue"]
 
     #print(info)
     return info

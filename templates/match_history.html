@@ -209,6 +209,29 @@
             red_team_container.empty();
             blue_team_container.empty();
 
+
+            if (info["mode"].toLowerCase() == "deathmatch") {
+                // sort by kills
+                info.players_dm.sort((a,b) => b.stats.score - a.stats.score);
+
+                for (let i = 0; i < info.players_dm.length; i++) {
+                    let player = info.players_dm[i];
+                    let row = document.createElement("div");
+                    row.classList.add("row");
+
+                    if (player.puuid == puuid) {
+                        row.id = "overlay-highlighted-player";
+                    }
+
+                    row.innerHTML = generate_row_html_dm(player, info);
+
+                    red_team_container.append(row);
+                }
+                console.log(info["players_dm"]);
+                return;
+            }
+
+
             eco_frags = {}
             for (let i = 0; i < info.rounds.length; i++) {
                 red_team_value = 0;               
@@ -273,7 +296,7 @@
 
                 row.innerHTML = generate_row_html(player, info, eco_frags);
 
-                red_team_container.append(row)
+                red_team_container.append(row);
             }
 
             for (let i = 0; i < info.players_blue.length; i++) {
@@ -287,7 +310,7 @@
 
                 row.innerHTML = generate_row_html(player, info, eco_frags);
 
-                blue_team_container.append(row)
+                blue_team_container.append(row);
             }
 
         });
@@ -346,9 +369,33 @@
             return row_html;
         }
 
+        function generate_row_html_dm(player, info, eco_frags) {
+            row_html = `
+                <div class="col-1"><img src="${image_paths[player.character.toLowerCase()]}" class="overlay-agent-icon"/></div> 
+                <div class="col-2"><a href="{{ url_for("match_history") }}?username=${player.name}%23${player.tag}" class="player-name-link">${player.name}#${player.tag}</a></div>
+                <div class="col-1"><img src="${image_paths[player.currenttier]}" class="overlay-rank-icon"/></div>
+                <div class="col-1">${Math.round(player.stats.score / info.num_rounds)}</div>
+                <div class="col-1">${player.stats.kills}</div>
+                <div class="col-1">${player.stats.deaths}</div>
+                <div class="col-1">${player.stats.assists}</div>
+                <div class="col-1"></div>
+                <div class="col-1"></div>
+                <div class="col-1"></div>
+                `;
+            return row_html;
+        }
+
         function increment_match_indices() {
             match_index_start = match_index_end;
             match_index_end += matches_per_load;
+        }
+
+        function populate_overlay() {
+
+        }
+
+        function populate_overlay_dm() {
+
         }
 
     });
