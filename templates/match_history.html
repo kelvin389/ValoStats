@@ -81,10 +81,19 @@
         // puuid of the user currently being viewed.
         // gets set when matches are initially loaded
         let puuid = "";
+        // start and end index for match history.
+        // used directly in the request to valorant api
+        // gets incremented as pages of matches are loaded
         let start = -1;
         let end = -1;
-
+        
         const matches_per_load = 5;
+
+        // id of the match currently or most recently displayed in overlay.
+        // prevents problem where user can open a match in the overlay then
+        // close it before it loads and opens another match, causing 2 datasets
+        // to be loaded into the overlay
+        let overlay_match_id = "";
 
         // overlay is enabled by default in the HTML. TODO: change this because the overlay flashes on screen
         hide_overlay();
@@ -181,7 +190,11 @@
         });
 
         // triggered when a match is clicked on and the backend responds with full match data
-        socket.on("display-specific-match", function(info) {
+        socket.on("display-specific-match", function(match_id, info) {
+            // prevent displaying the wrong match due to user opening multiple instances of the overlay
+            // before each instance has a chance to finish loading
+            if (match_id != overlay_match_id) return;
+
             let red_team_container = $("#red_team_players");
             let blue_team_container = $("#blue_team_players");
             // clear loading text
@@ -294,7 +307,9 @@
         $(document).on("click", ".match-data", function() {
             // "this" refers to the .match-data element.
             // event.target may be child elements so we pull id from "this" instead
-            socket.emit("load-specific-match", this.id);
+            let match_id = this.id;
+            socket.emit("load-specific-match", match_id);
+            overlay_match_id = match_id;
             show_overlay();
         });
 

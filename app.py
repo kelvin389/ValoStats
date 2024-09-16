@@ -61,7 +61,7 @@ def load_more_matches(puuid, start, end):
 def load_specific_match(match_id): 
     match_info = query_match_info(match_id)["data"]
     info = get_relevent_info_large(match_info)
-    emit("display-specific-match", info, to=request.sid)
+    emit("display-specific-match", (match_id, info), to=request.sid)
 
 def load_match_history(puuid, start_index, end_index):
     # show loading text on page

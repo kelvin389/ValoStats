@@ -11,5 +11,6 @@ More info about the API key on the [HenrikDev GitHub page](https://github.com/He
 ---
 **Technologies Used**:
 - Flask
+- Flask-SocketIO
 - JQuery
 - Vanilla Python/HTML/CSS/Javascript
