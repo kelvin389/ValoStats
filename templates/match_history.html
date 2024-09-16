@@ -267,6 +267,10 @@
                 let row = document.createElement("div");
                 row.classList.add("row");
 
+                if (player.puuid == puuid) {
+                    row.id = "overlay-highlighted-player";
+                }
+
                 row.innerHTML = generate_row_html(player, info, eco_frags);
 
                 red_team_container.append(row)
@@ -276,6 +280,10 @@
                 let player = info.players_blue[i];
                 let row = document.createElement("div");
                 row.classList.add("row");
+
+                if (player.puuid == puuid) {
+                    row.id = "overlay-highlighted-player";
+                }
 
                 row.innerHTML = generate_row_html(player, info, eco_frags);
 

@@ -49,8 +49,8 @@ def load_init_matches(username, start_index, end_index):
 
     # reset start and end when puuid changes
     puuid = query_account_info(name, tag)["data"]["puuid"]
-    load_more_matches(puuid, start_index, end_index)
     emit("set-puuid", puuid, to=request.sid)
+    load_more_matches(puuid, start_index, end_index)
 
 @socketio.on("load-more-matches")
 def load_more_matches(puuid, start_index, end_index):
