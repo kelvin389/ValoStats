@@ -42,19 +42,19 @@ def disconnect():
     print(f"client joined room {room}")
 
 @socketio.on("load-init-matches")
-def load_init_matches(username, start, end):
+def load_init_matches(username, start_index, end_index):
     pieces = username.split("#")
     name = pieces[0]
     tag = pieces[1]
 
     # reset start and end when puuid changes
     puuid = query_account_info(name, tag)["data"]["puuid"]
-    load_more_matches(puuid, start, end)
+    load_more_matches(puuid, start_index, end_index)
     emit("set-puuid", puuid, to=request.sid)
 
 @socketio.on("load-more-matches")
-def load_more_matches(puuid, start, end):
-    load_match_history(puuid, start, end)
+def load_more_matches(puuid, start_index, end_index):
+    load_match_history(puuid, start_index, end_index)
 
 # TODO: this queries the match again. the previously queried data can probably just be used for efficiency
 @socketio.on("load-specific-match")
@@ -125,6 +125,7 @@ def query_match_history(puuid, region, start_index, end_index):
     }
     #response = requests.post(URL_BASE + url_ext, headers=headers, json=data)
     response = query_post(URL_BASE + url_ext, headers, data)
+    print(response.json())
     return response.json()
     
 def query_match_info(match_id):

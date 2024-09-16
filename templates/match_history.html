@@ -85,8 +85,8 @@
         // start and end index for match history.
         // used directly in the request to valorant api
         // gets incremented as pages of matches are loaded
-        let start = -1;
-        let end = -1;
+        let match_index_start = -1;
+        let match_index_end = -1;
 
         // id of the match currently or most recently displayed in overlay.
         // prevents problem where user can open a match in the overlay then
@@ -94,20 +94,29 @@
         // to be loaded into the overlay
         let overlay_match_id = "";
 
+        // only initialize start/end vars and inital set of matches once.
+        // fixes bug where the socketio connection is broken and upon
+        // reconnect, the page is reinitialized
+        let needs_init = true;
+
         // overlay is enabled by default in the HTML. TODO: change this because the overlay flashes on screen
         hide_overlay();
 
         socket.on("connect", function() {
             console.log("[Match History]: Connected to server");
 
-            // get username parameter from search bar
-            search_params = new URLSearchParams(window.location.search);
-            let username = search_params.get("username");
+            // initialize start/end vars and load initial set of matches
+            if (needs_init) {
+                // get username parameter from search bar
+                search_params = new URLSearchParams(window.location.search);
+                let username = search_params.get("username");
 
-            // initialize start/end and load matches
-            start = 0;
-            end = matches_per_load;
-            socket.emit("load-init-matches", username, start, end);
+                match_index_start = 0;
+                match_index_end = matches_per_load;
+                needs_init = false;
+                socket.emit("load-init-matches", username, match_index_start, match_index_end);
+                increment_match_indices();
+            }
         });
 
         socket.on("set-puuid", function(new_puuid) {
@@ -276,7 +285,8 @@
         });
 
         $("#load-more-button").click(function() {
-            socket.emit("load-more-matches", puuid, start, end);
+            socket.emit("load-more-matches", puuid, match_index_start, match_index_end);
+            increment_match_indices();
         });
 
         $("#overlay").click(function(event) {
@@ -326,6 +336,11 @@
                 <div class="col-1">${eco_frags[player.puuid]}</div>
                 `;
             return row_html;
+        }
+
+        function increment_match_indices() {
+            match_index_start = match_index_end;
+            match_index_end += matches_per_load;
         }
 
     });
