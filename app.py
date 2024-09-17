@@ -71,14 +71,12 @@ def load_match_history(puuid, start_index, end_index):
     data = query_match_history(puuid, "na", start_index, end_index)
     matches = data["History"]
 
-
     for match in matches:
         id = match["MatchID"]
         match_info = query_match_info(id)["data"]
         info = get_relevent_info_small(match_info, puuid)
         emit("append-match-history", info, to=request.sid)
     emit("hide-loading", to=request.sid)
-
 
     # code below loads the matches in batches.
     # replaced by above for loop which loads matches as the api responds (more responsive)

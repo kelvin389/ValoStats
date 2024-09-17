@@ -66,3 +66,55 @@
     color: white;
     text-decoration: none;
 }
+
+.dotted-underline {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+
+/* username must be statically set in size otherwise tables for the 2 teams will misalign.
+   agent and rank icons are also set to minimize cell size for these images */
+.overlay-table-head-agent-icon {
+    width: 70px;
+}
+
+.overlay-table-head-username {
+    /* max username length: (16 chars)#(5 chars) 
+    so 22ch for exact fit, plus 4ch for padding
+    */
+    width: 26ch;
+}
+
+.overlay-table-head-rank-icon {
+    width: 70px;
+}
+
+/*
+.overlay-table-head-acs {
+    width: 5ch;
+}
+
+.overlay-table-head-kills {
+    width: 5ch;
+}
+
+.overlay-table-head-deaths {
+    width: 7ch;
+}
+
+.overlay-table-head-assists {
+    width: 7ch;
+}
+
+.overlay-table-head-adr {
+    width: 6ch;
+}
+
+.overlay-table-head-hsp {
+    width: 6ch;
+}
+
+.overlay-table-head-ecos {
+    width: 6ch;
+}
+*/
