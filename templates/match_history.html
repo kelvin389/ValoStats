@@ -203,16 +203,11 @@
             $("#load-more-button").show();
         });
 
+        // there is no way to recover from error so we dont need a hide-error function
         socket.on("show-error", function() {
             $("#error").show();
             $("#load-more-button").hide();
             $("#loading").hide();
-        });
-
-        socket.on("hide-error", function() {
-            $("#error").hide();
-            $("#load-more-button").show();
-            //$("#loading").sh();
         });
 
         // triggered when a match is clicked on and the backend responds with full match data
