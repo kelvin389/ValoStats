@@ -101,6 +101,8 @@
 
         // overlay is enabled by default in the HTML. TODO: change this because the overlay flashes on screen
         hide_overlay();
+        $("#error").hide()
+        $("#load-more-button").hide()
 
         socket.on("connect", function() {
             console.log("[Match History]: Connected to server");
@@ -197,6 +199,18 @@
             $("#load-more-button").show();
         });
 
+        socket.on("show-error", function() {
+            $("#error").show();
+            $("#load-more-button").hide();
+            $("#loading").hide();
+        });
+
+        socket.on("hide-error", function() {
+            $("#error").hide();
+            $("#load-more-button").show();
+            //$("#loading").sh();
+        });
+
         // triggered when a match is clicked on and the backend responds with full match data
         socket.on("display-specific-match", function(match_id, info) {
             // prevent displaying the wrong match due to user opening multiple instances of the overlay
@@ -216,8 +230,7 @@
 
                 for (let i = 0; i < info.players_dm.length; i++) {
                     let player = info.players_dm[i];
-                    let row = document.createElement("div");
-                    row.classList.add("row");
+                    let row = document.createElement("tr");
 
                     if (player.puuid == puuid) {
                         row.id = "overlay-highlighted-player";
@@ -388,14 +401,6 @@
             match_index_end += matches_per_load;
         }
 
-        function populate_overlay() {
-
-        }
-
-        function populate_overlay_dm() {
-
-        }
-
     });
 </script>
 </head>
@@ -416,8 +421,11 @@
         <div id="matches-container">
 
         </div>
-        <div id="loading">
+        <div id="loading" class="text-center">
             <h2>loading matches...</h2>
+        </div>
+        <div id="error" class="text-center">
+            <h2>the user you are looking for does not exist</h2>
         </div>
         <div class="justify-content-center d-flex">
             <button id="load-more-button">load more</button>

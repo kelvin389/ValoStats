@@ -44,13 +44,20 @@ def disconnect():
 @socketio.on("load-init-matches")
 def load_init_matches(username, start_index, end_index):
     pieces = username.split("#")
-    name = pieces[0]
-    tag = pieces[1]
+    name = ""
+    tag = ""
+    if len(pieces) >= 2:
+        name = pieces[0]
+        tag = pieces[1]
 
     # reset start and end when puuid changes
-    puuid = query_account_info(name, tag)["data"]["puuid"]
-    emit("set-puuid", puuid, to=request.sid)
-    load_more_matches(puuid, start_index, end_index)
+    puuid = query_puuid(name, tag)
+    if puuid:
+        emit("set-puuid", puuid, to=request.sid)
+        load_more_matches(puuid, start_index, end_index)
+    else:
+        print("BAD TAG")
+        emit("show-error")
 
 @socketio.on("load-more-matches")
 def load_more_matches(puuid, start_index, end_index):
@@ -78,34 +85,20 @@ def load_match_history(puuid, start_index, end_index):
         emit("append-match-history", info, to=request.sid)
     emit("hide-loading", to=request.sid)
 
-    # code below loads the matches in batches.
-    # replaced by above for loop which loads matches as the api responds (more responsive)
-    """
-    # query API for match info of every match.
-    match_infos = []
-    for match in matches:
-        id = match["MatchID"]
-        print(id)
-        info = query_match_info(id)["data"]
-        match_infos.append(info)
-
-    # hide loading text just before the content is sent and shown
-    emit("hide-loading")
-
-    # filter by useful data and send to frontend
-    for match_info in match_infos:
-        info = get_relevent_info_small(match_info, puuid)
-        emit("append-match-history", info)
-    """
-
 def query_account_info(name, tag):
     url_ext = f"/v1/account/{name}/{tag}"
     params = {
         "api_key": api_key
     }
-    #response = requests.get(URL_BASE + url_ext, params)
     response = query_get(URL_BASE + url_ext, params)
-    return response.json()
+    return response.json() if response else None
+
+def query_puuid(name, tag):
+    acc_info = query_account_info(name, tag)
+    if acc_info:
+        return acc_info["data"]["puuid"]
+    return None
+    
 
 def query_match_history(puuid, region, start_index, end_index):
     #queue = "all"
@@ -121,7 +114,7 @@ def query_match_history(puuid, region, start_index, end_index):
         "queries": f"?startIndex={start_index}&endIndex={end_index}"
         #"queries": f"?startIndex={start_index}&endIndex={end_index}&queue={queue}"
     }
-    #response = requests.post(URL_BASE + url_ext, headers=headers, json=data)
+
     response = query_post(URL_BASE + url_ext, headers, data)
     return response.json()
     
@@ -130,49 +123,41 @@ def query_match_info(match_id):
     params = {
         "api_key": api_key
     }
-    #response = requests.get(URL_BASE + url_ext, params)
     response = query_get(URL_BASE + url_ext, params)
     return response.json()
 
 # filter through match info and extract only information that is relevent to show on the frontend.
 # this reduces the amount of data being sent through socketio due to the majority of match info being useless (for my use case)
 def get_relevent_info_small(match_info, puuid):
-    #f = open("data.txt", "w")
-    #f.write(json.dumps(match_info))
-    #f.close()
     info = {}
     info["match_id"] = match_info["metadata"]["matchid"]
     info["map"] = match_info["metadata"]["map"]
     info["start_time"] = match_info["metadata"]["game_start"] * 1000 # convert from seconds to ms since epoch
     info["mode"] = match_info["metadata"]["mode"]
     all_players = match_info["players"]["all_players"]
+
+    max_non_self_kills = -1
     for player in all_players:
+        # track highest kills out of all other players if mode is deathmatch
+        if info["mode"].lower() == "deathmatch":
+            max_non_self_kills = max(player["stats"]["kills"], max_non_self_kills)
+
         if player["puuid"] == puuid:
             info["character"] = player["character"].lower()
             info["tier"] = player["currenttier"]
             info["stats"] = player["stats"]
 
-            team_name = player["team"].lower()
-            if (info["mode"].lower() == "deathmatch"):
-                won = True if match_info["rounds"][0]["winning_team"] == puuid else False
-
-                player_stats = None
-                max_non_self_kills = -1
-                for stats in match_info["rounds"][0]["player_stats"]:
-                    # find player object for the player being looked up
-                    if stats["player_puuid"] == puuid:
-                        player_stats = stats
-                    
-                    if stats != player_stats:
-                        max_non_self_kills = max(stats["kills"], max_non_self_kills)
-
-                kills = player_stats["kills"]
-                info["team_info"] = {"has_won": won, "rounds_won": kills, "rounds_lost": max_non_self_kills}
-            else:
+            # for normal matches, gather remaining team info and return
+            if info["mode"].lower() != "deathmatch":
+                team_name = player["team"].lower()
                 info["team_info"] = match_info["teams"][team_name]
-            break
-    
-    #print(info)
+                return info
+
+    # only deathmatches should reach this point.
+    # gather remaining info for deathmatch and return
+    won = True if match_info["rounds"][0]["winning_team"] == puuid else False
+    info["team_info"] = {"has_won": won, "rounds_won": info["stats"]["kills"], "rounds_lost": max_non_self_kills}
+
     return info
 
 def get_relevent_info_large(match_info):
@@ -191,45 +176,46 @@ def get_relevent_info_large(match_info):
         info["players_red"] = match_info["players"]["red"]
         info["players_blue"] = match_info["players"]["blue"]
 
-    #print(info)
     return info
 
 
+# wrapper function for requests.get() that accounts for rate limiting
 def query_get(url, params):
-    # retry 5 times then just give up
+    # retry 5 times then just give up.
+    # i is also used to slightly increase sleep time between retries
     for i in range(5):
         response = requests.get(url, params)
 
-        if response.status_code == 429:
+        if response.status_code == 200:
+            return response
+        elif response.status_code == 429:
             print(response.json())
             print(response.headers)
-            print(f"rate limited while trying {url}. waiting {RATE_LIMIT_SLEEP_TIME} second and retrying")
-            time.sleep(RATE_LIMIT_SLEEP_TIME)
-        elif response.status_code == 200:
-            break
+            print(f"rate limited while trying {url}. waiting {RATE_LIMIT_SLEEP_TIME + i} seconds and retrying")
+            time.sleep(RATE_LIMIT_SLEEP_TIME + i)
         else:
             print("UNEXPECTED RESPONSE:", response, response.reason)
             break
-    return response
+    return None
 
-
-
+# wrapper function for requests.post() that accounts for rate limiting
 def query_post(url, headers, json):
-    # retry 5 times then just give up
+    # retry 5 times then just give up.
+    # i is also used to slightly increase sleep time between retries
     for i in range(5):
         response = requests.post(url, headers=headers, json=json)
 
-        if response.status_code == 429:
+        if response.status_code == 200:
+            return response
+        elif response.status_code == 429:
             print(response.json())
             print(response.headers)
-            print(f"rate limited while trying {url}. waiting {RATE_LIMIT_SLEEP_TIME} second and retrying")
-            time.sleep(RATE_LIMIT_SLEEP_TIME)
-        elif response.status_code == 200:
-            break
+            print(f"rate limited while trying {url}. waiting {RATE_LIMIT_SLEEP_TIME + i} seconds and retrying")
+            time.sleep(RATE_LIMIT_SLEEP_TIME + i)
         else:
             print("UNEXPECTED RESPONSE:", response, response.reason)
             break
-    return response
+    return None
 
 
 if __name__ == "__main__":
