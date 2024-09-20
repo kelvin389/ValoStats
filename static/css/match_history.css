@@ -10,8 +10,63 @@
     aspect-ratio: 1/1;
 }
 
+#matches-container {
+    width: 70%;
+    margin: auto;
+}
+
+@media (max-width: 1450px) {
+    #matches-container {
+        width: 80%;
+    }
+}
+@media (max-width: 1050px) {
+    #matches-container {
+        width: 100%;
+    }
+}
+@media (max-width: 390px) {
+    .match-data-center {
+        font-size: 16px;
+    }
+    .match-data-right {
+        font-size: 12px;
+    }
+}
+
+.match-data {
+    border: 2px solid black;
+}
+
 .match-data span {
+    display: inline-block;
+    text-align: center;
     padding: 10px;
+    border: 1px solid black;
+}
+
+.match-data-center {
+    font-size: 20px;
+}
+
+.match-data-score {
+    width: 6ch;
+}
+
+.match-data-kda {
+    width: 9ch;
+}
+
+.match-data-map-name {
+    width: 9ch;
+}
+
+.match-data-time {
+    width: 11ch;
+}
+
+.match-data-gamemode {
+    width: 12ch;
 }
 
 .win {

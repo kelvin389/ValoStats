@@ -160,13 +160,23 @@
                 time_ago_str = diff_in_seconds + " sec ago";
             }
             
-            // create match html structure
-            let match_div = document.createElement("div");
-            match_div.classList.add("match", "flex-row", "d-flex", "justify-content-center", "my-1");
-
             // match data html structure
             let match_data_div = document.createElement("div");
-            match_data_div.classList.add("match-data", "p-2");
+            match_data_div.classList.add("match-data", "p-2", "row", "my-1");
+
+            // create divs that hold match data in 3 divs
+            let match_data_left_div = document.createElement("div");
+            match_data_left_div.classList.add("match-data-left", "col-3", "text-start", "align-content-center");
+            let match_data_center_div = document.createElement("div");
+            match_data_center_div.classList.add("match-data-center", "col-4", "text-center", "align-content-center");
+            let match_data_right_div = document.createElement("div");
+            match_data_right_div.classList.add("match-data-right", "col-5", "text-end", "align-content-center");
+
+            // place child divs inside of main match data div
+            match_data_div.append(match_data_left_div);
+            match_data_div.append(match_data_center_div);
+            match_data_div.append(match_data_right_div);
+
             // add matchid as id. this will be used if the user clicks on the match
             match_data_div.setAttribute("id", info.match_id);
 
@@ -176,19 +186,22 @@
             console.log(info.tier);
 
             // generate html for a match
-            match_data_div.innerHTML = `
-                <img src="${image_paths[info.tier]}" class="rank-icon img-fluid"/>
-                <img src="${image_paths[info.character]}" class="agent-icon img-fluid"/>
-                <span class="gamemode">${info.mode}</span>
-                <span class="time">${time_ago_str}</span>
-                <span class="map-name">${info.map}</span>
-                <span class="score">${info.team_info.rounds_won}:${info.team_info.rounds_lost}</span>
-                <span class="KDA">${info.stats.kills}/${info.stats.deaths}/${info.stats.assists}</span>
+            match_data_left_div.innerHTML = `
+                <img src="${image_paths[info.tier]}" class="rank-icon img-fluid my-1"/>
+                <img src="${image_paths[info.character]}" class="agent-icon img-fluid my-1"/>
+            `;
+            match_data_center_div.innerHTML = `
+                <span class="match-data-score my-1">${info.team_info.rounds_won}:${info.team_info.rounds_lost}</span>
+                <span class="match-data-kda my-1">${info.stats.kills}/${info.stats.deaths}/${info.stats.assists}</span>
+            `;
+            match_data_right_div.innerHTML = `
+                <span class="match-data-time my-1">${time_ago_str}</span>
+                <span class="match-data-map-name my-1">${info.map}</span>
+                <span class="match-data-gamemode my-1">${info.mode}</span>
             `;
 
             let container = $("#matches-container");
-            match_div.append(match_data_div);
-            container.append(match_div);
+            container.append(match_data_div);
         });
 
         socket.on("show-loading", function() {

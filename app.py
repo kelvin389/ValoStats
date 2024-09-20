@@ -10,6 +10,8 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 
 URL_BASE = "https://api.henrikdev.xyz/valorant"
 RATE_LIMIT_SLEEP_TIME = 60
+REQUEST_TIMEOUT_CONNECT = 4
+REQUEST_TIMEOUT_READ = 2
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -39,7 +41,7 @@ def connect():
 def disconnect():
     room = request.sid
     leave_room(room)
-    print(f"client joined room {room}")
+    print(f"client left room {room}")
 
 @socketio.on("load-init-matches")
 def load_init_matches(username, start_index, end_index):
@@ -184,18 +186,24 @@ def query_get(url, params):
     # retry 5 times then just give up.
     # i is also used to slightly increase sleep time between retries
     for i in range(5):
-        response = requests.get(url, params)
+        try:
+            print("sent get", url)
+            response = requests.get(url, params, timeout=(REQUEST_TIMEOUT_CONNECT, REQUEST_TIMEOUT_READ))
+            print("got resp")
 
-        if response.status_code == 200:
-            return response
-        elif response.status_code == 429:
-            print(response.json())
-            print(response.headers)
-            print(f"rate limited while trying {url}. waiting {RATE_LIMIT_SLEEP_TIME + i} seconds and retrying")
-            time.sleep(RATE_LIMIT_SLEEP_TIME + i)
-        else:
-            print("UNEXPECTED RESPONSE:", response, response.reason)
-            break
+            if response.status_code == 200:
+                return response
+            elif response.status_code == 429:
+                print(response.json())
+                print(response.headers)
+                print(f"rate limited while trying {url}. waiting {RATE_LIMIT_SLEEP_TIME + i} seconds and retrying")
+                time.sleep(RATE_LIMIT_SLEEP_TIME + i)
+            else:
+                print("UNEXPECTED RESPONSE:", response, response.reason)
+                break
+        except:
+            print(f"request for {url} timed out")
+
     return None
 
 # wrapper function for requests.post() that accounts for rate limiting
@@ -203,18 +211,23 @@ def query_post(url, headers, json):
     # retry 5 times then just give up.
     # i is also used to slightly increase sleep time between retries
     for i in range(5):
-        response = requests.post(url, headers=headers, json=json)
+        try:
+            print("sent post")
+            response = requests.post(url, headers=headers, json=json, timeout=(REQUEST_TIMEOUT_CONNECT, REQUEST_TIMEOUT_READ))
+            print("got resp")
 
-        if response.status_code == 200:
-            return response
-        elif response.status_code == 429:
-            print(response.json())
-            print(response.headers)
-            print(f"rate limited while trying {url}. waiting {RATE_LIMIT_SLEEP_TIME + i} seconds and retrying")
-            time.sleep(RATE_LIMIT_SLEEP_TIME + i)
-        else:
-            print("UNEXPECTED RESPONSE:", response, response.reason)
-            break
+            if response.status_code == 200:
+                return response
+            elif response.status_code == 429:
+                print(response.json())
+                print(response.headers)
+                print(f"rate limited while trying {url}. waiting {RATE_LIMIT_SLEEP_TIME + i} seconds and retrying")
+                time.sleep(RATE_LIMIT_SLEEP_TIME + i)
+            else:
+                print("UNEXPECTED RESPONSE:", response, response.reason)
+                break
+        except:
+            print(f"request for {url} timed out")
     return None
 
 
