@@ -73,7 +73,8 @@
     };
 
     $(document).ready(function() {
-        const eco_max_value = 10000;
+        const eco_opponent_max_value = 15000;
+        const eco_team_min_value = 15000;
         const matches_per_load = 5;
 
         // initialize socket
@@ -100,7 +101,7 @@
         let needs_init = true;
 
         // set text when hovering over "Eco Frags (?)" text in the overlay table header
-        $(".overlay-table-head-ecos").attr("title", `Kills achieved while opponents' total loadout value was less than ${eco_max_value}`);
+        $(".overlay-table-head-ecos").attr("title", `Kills achieved while opponents' total loadout value was less than ${eco_opponent_max_value} and own teams loadout value exceeded ${eco_team_min_value}`);
 
         // hide elements that should not be seen initially
         hide_overlay();
@@ -262,11 +263,6 @@
                 red_team_value = 0;               
                 blue_team_value = 0;               
 
-                // skip the pistol rounds for both halfs
-                if (i == 0 || i == 12) {
-                    continue;
-                }
-
                 // get loadout value for each team
                 for (let j = 0; j < info.rounds[i].player_stats.length; j++) {
                     player = info.rounds[i].player_stats[j];
@@ -286,14 +282,14 @@
                 console.log(red_team_value);
 
                 // count eco frags
-                if (red_team_value < eco_max_value) {
+                if (red_team_value < eco_opponent_max_value && blue_team_value > eco_team_min_value) {
                     for (let j = 0; j < info.rounds[i].player_stats.length; j++) {
                         player = info.rounds[i].player_stats[j];
                         if (player.player_team.toLowerCase() == "blue") {
                             eco_frags[player.player_puuid] += player.kills;
                         }
                     }
-                } else if (blue_team_value < eco_max_value) {
+                } else if (blue_team_value < eco_opponent_max_value && red_team_value > eco_team_min_value) {
                     for (let j = 0; j < info.rounds[i].player_stats.length; j++) {
                         player = info.rounds[i].player_stats[j];
                         if (player.player_team.toLowerCase() == "red") {
@@ -458,7 +454,7 @@
                         <th class="overlay-table-head-assists">Assists</th>
                         <th class="overlay-table-head-adr">ADR</th>
                         <th class="overlay-table-head-hsp">HS%</th>
-                        <th class="overlay-table-head-ecos dotted-underline">Eco Frags (?)</th>
+                        <th class="overlay-table-head-ecos dotted-underline">Eco Frags</th>
                     </thead>
                     <tbody id="red_team_players">
                     </tbody>
@@ -479,7 +475,7 @@
                         <th class="overlay-table-head-assists">Assists</th>
                         <th class="overlay-table-head-adr">ADR</th>
                         <th class="overlay-table-head-hsp">HS%</th>
-                        <th class="overlay-table-head-ecos dotted-underline">Eco Frags (?)</th>
+                        <th class="overlay-table-head-ecos dotted-underline">Eco Frags</th>
                     </thead>
                     <tbody id="blue_team_players">
                     </tbody>

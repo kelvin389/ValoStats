@@ -10,8 +10,8 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 
 URL_BASE = "https://api.henrikdev.xyz/valorant"
 RATE_LIMIT_SLEEP_TIME = 60
-REQUEST_TIMEOUT_CONNECT = 4
-REQUEST_TIMEOUT_READ = 2
+REQUEST_TIMEOUT_CONNECT = 5
+REQUEST_TIMEOUT_READ = 4
 
 app = Flask(__name__)
 socketio = SocketIO(app)
