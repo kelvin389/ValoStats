@@ -15,6 +15,11 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/match_history.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
 <link rel="stylesheet" href="match_history.css">
+<!-- font(s) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
 <script>
     const image_paths = {
         brimstone: "{{ url_for('static', filename='images/agent_icons/brimstone.png') }}",
@@ -130,14 +135,23 @@
             puuid = new_puuid;
         });
 
-        // get match history for another user on button click
+        // get match history for another user on button click or when pressing enter while input textbox is selected
         $("#username-submit").click(function () {
+            search_user();
+        });
+        $("#username-input").keypress(function (event) {
+            if (event.which == 13) {
+                search_user();
+            }
+        });
+
+        function search_user() {
             let username = $("#username-input").val();
 
             let url = new URL("{{ url_for('match_history') }}", window.location.origin);
             url.searchParams.append("username", username);
             window.location.href = url;
-        });
+        }
 
         socket.on("append-match-history", function(info) {
             // calculate how long ago this game took place
@@ -188,8 +202,8 @@
 
             // generate html for a match
             match_data_left_div.innerHTML = `
-                <img src="${image_paths[info.tier]}" class="rank-icon img-fluid my-1"/>
-                <img src="${image_paths[info.character]}" class="agent-icon img-fluid my-1"/>
+                <img src="${image_paths[info.tier]}" class="match-data-rank-icon img-fluid my-1"/>
+                <img src="${image_paths[info.character]}" class="match-data-agent-icon img-fluid my-1"/>
             `;
             match_data_center_div.innerHTML = `
                 <span class="match-data-score my-1">${info.team_info.rounds_won}:${info.team_info.rounds_lost}</span>
@@ -425,6 +439,7 @@
     </select>
     </h4>
     <h1 class="d-flex justify-content-center">{{ username }}</h1>
+    <hr id="username-divider"">
     <div class="container py-2 mb-5" id="main-container">
         <div id="matches-container">
 

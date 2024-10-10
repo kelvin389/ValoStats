@@ -23,13 +23,23 @@
             console.log("[Index]: Connected to server");
         });
 
+        // get match history for another user on button click or when pressing enter while input textbox is selected
         $("#username-submit").click(function () {
+            search_user();
+        });
+        $("#username-input").keypress(function (event) {
+            if (event.which == 13) {
+                search_user();
+            }
+        });
+
+        function search_user() {
             let username = $("#username-input").val();
 
             let url = new URL("{{ url_for('match_history') }}", window.location.origin);
             url.searchParams.append("username", username);
             window.location.href = url;
-        });
+        }
     });
 </script>
 </head>
