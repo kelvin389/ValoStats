@@ -167,9 +167,9 @@
 
             let time_ago_str = "";
             if (diff_in_days > 0) {
-                time_ago_str = diff_in_days + " days ago";
+                time_ago_str = (diff_in_days == 1 ? "1 day ago" : diff_in_days + " days ago");
             } else if (diff_in_hours > 0) {
-                time_ago_str = diff_in_hours + " hrs ago";
+                time_ago_str = (diff_in_hours == 1 ? "1 hour ago" : diff_in_hours + " hrs ago");
             } else if (diff_in_minutes > 0) {
                 time_ago_str = diff_in_minutes + " min ago";
             } else {
