@@ -204,8 +204,6 @@
             // add appropriate css class based on whether the player won or not
             (info.team_info.has_won ? match_data_div.addClass("win") : match_data_div.addClass("loss"));
 
-            console.log(info.tier);
-
             // generate html for a match
             match_data_left_div.html(`
                 <img src="${image_paths[info.tier]}" class="match-data-rank-icon img-fluid my-1"/>
@@ -300,8 +298,6 @@
                     }
                 }
 
-                console.log(red_team_value);
-
                 // count eco frags
                 if (red_team_value < eco_opponent_max_value && blue_team_value > eco_team_min_value) {
                     for (let j = 0; j < info.rounds[i].player_stats.length; j++) {
@@ -320,9 +316,8 @@
                 }
             }
 
-            console.log(eco_frags);
-
             console.log(info);
+
             // sort teams by combat score (ACS)
             info.players_red.sort((a,b) => b.stats.score - a.stats.score);
             info.players_blue.sort((a,b) => b.stats.score - a.stats.score);
