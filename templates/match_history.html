@@ -111,12 +111,13 @@
 
         // hide elements that should not be seen initially
         hide_overlay();
-        $("#error").hide()
+        $("#bad-user-error").hide()
         $("#load-more-button").hide() // TODO: there is an error if this button is somehow pressed before the initial load
         
 
         socket.on("connect", function() {
             console.log("[Match History]: Connected to server");
+            $("#connection-error").hide();
 
             // initialize start/end vars and load initial set of matches
             if (needs_init) {
@@ -130,6 +131,11 @@
                 socket.emit("load-init-matches", username, match_index_start, match_index_end);
                 increment_match_indices();
             }
+        });
+
+        socket.on("disconnect", function() {
+            console.log("[Match History]: Disconnected from server");
+            $("#connection-error").show();
         });
 
         socket.on("set-puuid", function(new_puuid) {
@@ -236,8 +242,8 @@
         });
 
         // there is no way to recover from error so we dont need a hide-error function
-        socket.on("show-error", function() {
-            $("#error").show();
+        socket.on("show-bad-user-error", function() {
+            $("#bad-user-error").show();
             $("#load-more-button").hide();
             $("#loading").hide();
         });
@@ -465,14 +471,16 @@
         <div id="loading" class="text-center">
             <h2>loading matches...</h2>
         </div>
-        <div id="error" class="text-center">
+        <div id="bad-user-error" class="text-center">
             <h2>the user you are looking for does not exist</h2>
         </div>
         <div class="justify-content-center d-flex">
             <button id="load-more-button">load more</button>
         </div>
-
     </div>
+
+    <div id="connection-error">disconnected from server</div>
+
     <div id="overlay">
         <div id="overlay-box" class="container">
             <div id="red-team" class="overflow-auto">

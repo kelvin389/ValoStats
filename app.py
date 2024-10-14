@@ -59,7 +59,7 @@ def load_init_matches(username, start_index, end_index):
         load_more_matches(puuid, start_index, end_index)
     else:
         print("BAD TAG")
-        emit("show-error")
+        emit("show-bad-user-error")
 
 @socketio.on("load-more-matches")
 def load_more_matches(puuid, start_index, end_index):
