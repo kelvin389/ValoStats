@@ -177,7 +177,7 @@ body {
 }
 
 .overlay-rank-icon {
-    max-width: 48px;
+    max-width: 40px;
     height: auto;
     aspect-ratio: 1/1;
 }
@@ -186,6 +186,7 @@ body {
     max-width: 48px;
     height: auto;
     aspect-ratio: 1/1;
+    border-radius: 10px;
 }
 
 #overlay-highlighted-player {
