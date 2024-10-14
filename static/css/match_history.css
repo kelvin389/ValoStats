@@ -162,6 +162,11 @@ body {
     align-items: center;
 }
 
+#overlay-loading {
+    background-color: grey;
+    font-size: 48px;
+}
+
 #overlay-box {
     background: rgba(61,61,61,1);
     color: white;
@@ -242,4 +247,5 @@ body {
     background: grey;
     font-size: 64px;
     transform: translate(-50%, -50%);
+    text-wrap: none;
 }

@@ -81,7 +81,6 @@
         const eco_opponent_max_value = 15000;
         const eco_team_min_value = 15000;
         const matches_per_load = 5;
-        const loading_match_placeholder_html = `loading match data`;
 
         // initialize socket
         let socket = io();
@@ -256,7 +255,6 @@
 
             let red_team_container = $("#red-team-players");
             let blue_team_container = $("#blue-team-players");
-            // clear loading text
             red_team_container.empty();
             blue_team_container.empty();
 
@@ -363,7 +361,9 @@
 
                 blue_team_container.append(row);
             }
-
+            // once all the data has been processed, then we hide loading and show the table
+            $("#overlay-loading").hide();
+            $("#overlay-box").show();
         });
 
         $("#load-more-button").click(function() {
@@ -379,6 +379,8 @@
         });
 
         function show_overlay() {
+            $("#overlay-loading").show();
+            $("#overlay-box").hide();
             $("#overlay").show();
         }
 
@@ -386,11 +388,9 @@
             let red_team_container = $("#red-team-players");
             let blue_team_container = $("#blue-team-players");
             // empty containers and place loading text when overlay is hidden.
-            // this ensures old data isnt shown next time the overlay is opened
+            // this ensures old data is properly cleared before the next time the box is shown
             red_team_container.empty();
             blue_team_container.empty();
-            red_team_container.html(loading_match_placeholder_html);
-            blue_team_container.html(loading_match_placeholder_html);
 
             // remove coloring indicating which team the selected user is on
             $("#red-team-table").removeClass("team-table-ally");
@@ -479,9 +479,10 @@
         </div>
     </div>
 
-    <div id="connection-error">disconnected from server</div>
+    <div id="connection-error">disconnected from server. todo: replace this</div>
 
     <div id="overlay">
+        <div id="overlay-loading">loading match. todo: replace this</div>
         <div id="overlay-box" class="container">
             <div id="red-team" class="overflow-auto">
                 <table id="red-team-table" class="w-100 text-center border-bottom-thick team-table">
