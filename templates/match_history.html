@@ -329,7 +329,11 @@
                 let row = document.createElement("tr");
 
                 if (player.puuid == puuid) {
+                    // give a highlight to the searched player
                     row.id = "overlay-highlighted-player";
+                    // color table outline based on which team the searched player is
+                    $("#red-team-table").addClass("team-table-ally");
+                    $("#blue-team-table").addClass("team-table-enemy");
                 }
 
                 row.innerHTML = generate_row_html(player, info, eco_frags);
@@ -342,7 +346,11 @@
                 let row = document.createElement("tr");
 
                 if (player.puuid == puuid) {
+                    // give a highlight to the searched player
                     row.id = "overlay-highlighted-player";
+                    // color table outline based on which team the searched player is
+                    $("#red-team-table").addClass("team-table-ally");
+                    $("#blue-team-table").addClass("team-table-enemy");
                 }
 
                 row.innerHTML = generate_row_html(player, info, eco_frags);
@@ -377,6 +385,12 @@
             blue_team_container.empty();
             red_team_container.html(loading_match_placeholder_html);
             blue_team_container.html(loading_match_placeholder_html);
+
+            // remove coloring indicating which team the selected user is on
+            $("#red-team-table").removeClass("team-table-ally");
+            $("#red-team-table").removeClass("team-table-enemy");
+            $("#blue-team-table").removeClass("team-table-ally");
+            $("#blue-team-table").removeClass("team-table-enemy");
 
             $("#overlay").hide();
         }
@@ -443,7 +457,7 @@
     </select>
     </h4>
     <h1 class="d-flex justify-content-center">{{ username }}</h1>
-    <div id="username-divider" class="fading-divider"></div>
+    <div id="username-divider" class="fading-divider-white-dim-h"></div>
     <div class="container py-2 mb-5" id="main-container">
         <div id="matches-container">
 
@@ -462,7 +476,7 @@
     <div id="overlay">
         <div id="overlay-box" class="container">
             <div id="red-team" class="overflow-auto">
-                <table class="w-100 text-center border-bottom-thick team-table">
+                <table id="red-team-table" class="w-100 text-center border-bottom-thick team-table">
                     <thead>
                         <th class="overlay-table-head-agent-icon border-bottom"></th> 
                         <th class="overlay-table-head-username border-bottom"></th>
@@ -480,10 +494,11 @@
                 </table>
             </div>
 
-            <div id="team-divider" class="my-3 fading-divider"></div>
+            <!-- <div id="team-divider" class="my-3 fading-divider-white-dim-h"></div> -->
+            <div id="team-divider" class="my-3"></div>
 
             <div id="blue-team" class="overflow-auto">
-                <table class="w-100 text-center border-top-thick team-table">
+                <table id="blue-team-table" class="w-100 text-center border-top-thick team-table">
                     <thead>
                         <th class="overlay-table-head-agent-icon border-bottom"></th> 
                         <th class="overlay-table-head-username border-bottom"></th>
