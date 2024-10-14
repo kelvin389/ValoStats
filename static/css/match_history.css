@@ -234,32 +234,12 @@ body {
     width: 70px;
 }
 
-/*
-.overlay-table-head-acs {
-    width: 5ch;
+#connection-error {
+    position: fixed;
+    text-align: center;
+    top:50%;
+    left:50%;
+    background: grey;
+    font-size: 64px;
+    transform: translate(-50%, -50%);
 }
-
-.overlay-table-head-kills {
-    width: 5ch;
-}
-
-.overlay-table-head-deaths {
-    width: 7ch;
-}
-
-.overlay-table-head-assists {
-    width: 7ch;
-}
-
-.overlay-table-head-adr {
-    width: 6ch;
-}
-
-.overlay-table-head-hsp {
-    width: 6ch;
-}
-
-.overlay-table-head-ecos {
-    width: 6ch;
-}
-*/
