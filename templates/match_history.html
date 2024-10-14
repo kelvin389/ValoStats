@@ -177,16 +177,16 @@
             }
             
             // match data html structure
-            let match_data_div = document.createElement("div");
-            match_data_div.classList.add("match-data", "p-2", "row", "my-1");
+            let match_data_div = $("<div>");
+            match_data_div.addClass("match-data p-2 row my-1");
 
             // create divs that hold match data in 3 divs
-            let match_data_left_div = document.createElement("div");
-            match_data_left_div.classList.add("match-data-left", "col-3", "text-start", "align-content-center");
-            let match_data_center_div = document.createElement("div");
-            match_data_center_div.classList.add("match-data-center", "col-4", "text-center", "align-content-center");
-            let match_data_right_div = document.createElement("div");
-            match_data_right_div.classList.add("match-data-right", "col-5", "text-end", "align-content-center");
+            let match_data_left_div = $("<div>");
+            match_data_left_div.addClass("match-data-left col-3 text-start align-content-center");
+            let match_data_center_div = $("<div>");
+            match_data_center_div.addClass("match-data-center col-4 text-center align-content-center");
+            let match_data_right_div = $("<div>");
+            match_data_right_div.addClass("match-data-right col-5 text-end align-content-center");
 
             // place child divs inside of main match data div
             match_data_div.append(match_data_left_div);
@@ -194,27 +194,30 @@
             match_data_div.append(match_data_right_div);
 
             // add matchid as id. this will be used if the user clicks on the match
-            match_data_div.setAttribute("id", info.match_id);
+            match_data_div.attr("id", info.match_id);
 
             // add appropriate css class based on whether the player won or not
-            (info.team_info.has_won ? match_data_div.classList.add("win") : match_data_div.classList.add("loss"));
+            (info.team_info.has_won ? match_data_div.addClass("win") : match_data_div.addClass("loss"));
 
             console.log(info.tier);
 
             // generate html for a match
-            match_data_left_div.innerHTML = `
+            match_data_left_div.html(`
                 <img src="${image_paths[info.tier]}" class="match-data-rank-icon img-fluid my-1"/>
                 <img src="${image_paths[info.character]}" class="match-data-agent-icon img-fluid my-1"/>
-            `;
-            match_data_center_div.innerHTML = `
-                <span class="match-data-score my-1">${info.team_info.rounds_won}:${info.team_info.rounds_lost}</span>
-                <span class="match-data-kda my-1">${info.stats.kills}/${info.stats.deaths}/${info.stats.assists}</span>
-            `;
-            match_data_right_div.innerHTML = `
+            `);
+            match_data_center_div.html(`
+                <div class="match-data-center-container">
+                    <span class="match-data-score my-1">${info.team_info.rounds_won}:${info.team_info.rounds_lost}</span>
+                    <span class="match-data-center-divider fading-divider-white-bright-v"></span>
+                    <span class="match-data-kda my-1">${info.stats.kills}/${info.stats.deaths}/${info.stats.assists}</span>
+                </div>
+            `);
+            match_data_right_div.html(`
                 <span class="match-data-time my-1">${time_ago_str}</span>
                 <span class="match-data-map-name my-1">${info.map}</span>
                 <span class="match-data-gamemode my-1">${info.mode}</span>
-            `;
+            `);
 
             let container = $("#matches-container");
             container.append(match_data_div);
