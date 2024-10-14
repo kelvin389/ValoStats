@@ -105,6 +105,11 @@
         // reconnect, the page is reinitialized
         let needs_init = true;
 
+        // whether we are currently connected to the server via socket.
+        // used to stop user from trying to load matches while disconnected
+        // causing variables to increment while nothing is actually loaded
+        let socket_connected = false;
+
         // set text when hovering over "Eco Frags (?)" text in the overlay table header
         $(".overlay-table-head-ecos").attr("title", `Kills achieved while opponents' total loadout value was less than ${eco_opponent_max_value} and own teams loadout value exceeded ${eco_team_min_value}`);
 
@@ -112,9 +117,9 @@
         hide_overlay();
         $("#bad-user-error").hide()
         $("#load-more-button").hide() // TODO: there is an error if this button is somehow pressed before the initial load
-        
 
         socket.on("connect", function() {
+            socket_connected = true;
             console.log("[Match History]: Connected to server");
             $("#connection-error").hide();
 
@@ -133,6 +138,7 @@
         });
 
         socket.on("disconnect", function() {
+            socket_connected = false;
             console.log("[Match History]: Disconnected from server");
             $("#connection-error").show();
         });
@@ -365,6 +371,9 @@
         });
 
         $("#load-more-button").click(function() {
+            // dont allow user to try to load more when not connected to server
+            if (socket_connected == false) return;
+
             socket.emit("load-more-matches", puuid, match_index_start, match_index_end);
             increment_match_indices();
         });
