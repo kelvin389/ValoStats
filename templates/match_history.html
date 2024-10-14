@@ -258,17 +258,16 @@
             red_team_container.empty();
             blue_team_container.empty();
 
-
             if (info["mode"].toLowerCase() == "deathmatch") {
                 // sort by kills
                 info.players_dm.sort((a,b) => b.stats.score - a.stats.score);
 
                 for (let i = 0; i < info.players_dm.length; i++) {
                     let player = info.players_dm[i];
-                    let row = document.createElement("tr");
+                    let row = $("<tr>");
 
                     if (player.puuid == puuid) {
-                        row.id = "overlay-highlighted-player";
+                        row.attr("id", "overlay-highlighted-player");
                     }
 
                     row.innerHTML = generate_row_html_dm(player, info);
@@ -330,34 +329,38 @@
 
             for (let i = 0; i < info.players_red.length; i++) {
                 let player = info.players_red[i];
-                let row = document.createElement("tr");
+                let row = $("<tr>");
 
                 if (player.puuid == puuid) {
                     // give a highlight to the searched player
-                    row.id = "overlay-highlighted-player";
+                    row.attr("id", "overlay-highlighted-player");
                     // color table outline based on which team the searched player is
                     $("#red-team-table").addClass("team-table-ally");
                     $("#blue-team-table").addClass("team-table-enemy");
+                } else if (i % 2 == 0) {
+                    row.addClass("table-alt-row-color");
                 }
 
-                row.innerHTML = generate_row_html(player, info, eco_frags);
+                row.html(generate_row_html(player, info, eco_frags));
 
                 red_team_container.append(row);
             }
 
             for (let i = 0; i < info.players_blue.length; i++) {
                 let player = info.players_blue[i];
-                let row = document.createElement("tr");
+                let row = $("<tr>");
 
                 if (player.puuid == puuid) {
                     // give a highlight to the searched player
-                    row.id = "overlay-highlighted-player";
+                    row.attr("id", "overlay-highlighted-player");
                     // color table outline based on which team the searched player is
                     $("#red-team-table").addClass("team-table-ally");
                     $("#blue-team-table").addClass("team-table-enemy");
+                } else if (i % 2 == 0) {
+                    row.addClass("table-alt-row-color");
                 }
 
-                row.innerHTML = generate_row_html(player, info, eco_frags);
+                row.html(generate_row_html(player, info, eco_frags));
 
                 blue_team_container.append(row);
             }
